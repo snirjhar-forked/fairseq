@@ -139,3 +139,15 @@ wandb/
 nohup.out
 multirun
 outputs
+/*.sh
+/models
+/data
+/.sync*
+/.exclude*
+/cache_data
+__pycache__
+.ipynb_checkpoints
+.vscode
+/configs
+/c*
+/*.maddr
