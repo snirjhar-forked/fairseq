@@ -18,8 +18,7 @@ from fairseq.modules.quant_noise import quant_noise
 
 class GTDecoderLayer(nn.Module):
     def __init__(
-        self, cfg, no_encoder_attn=False, add_bias_kv=False, add_zero_attn=False
-    ):
+        self, cfg, no_encoder_attn=False, max_positions=1024):
         super().__init__()
         self.embed_dim = cfg.decoder.embed_dim
         self.dropout_module = FairseqDropout(
@@ -33,8 +32,7 @@ class GTDecoderLayer(nn.Module):
         self.self_attn = self.build_self_attention(
             self.embed_dim,
             cfg,
-            add_bias_kv=add_bias_kv,
-            add_zero_attn=add_zero_attn,
+            max_positions=max_positions,
         )
         self.attn_ln = (
             LayerNorm(self.embed_dim)
@@ -110,14 +108,13 @@ class GTDecoderLayer(nn.Module):
         return quant_noise(nn.Linear(input_dim, output_dim), q_noise, qn_block_size)
 
     def build_self_attention(
-        self, embed_dim, cfg, add_bias_kv=False, add_zero_attn=False
+        self, embed_dim, cfg, max_positions
     ):
         return GTAttention(
             embed_dim,
             cfg.decoder.attention_heads,
             dropout=cfg.attention_dropout,
-            add_bias_kv=add_bias_kv,
-            add_zero_attn=add_zero_attn,
+            max_positions=max_positions,
             self_attention=not cfg.cross_self_attention,
             q_noise=self.quant_noise,
             qn_block_size=self.quant_noise_block_size,

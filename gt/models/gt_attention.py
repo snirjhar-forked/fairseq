@@ -26,8 +26,7 @@ class GTAttention(FairseqIncrementalDecoder):
         vdim=None,
         dropout=0.0,
         bias=True,
-        add_bias_kv=False,
-        add_zero_attn=False,
+        max_positions=1024,
         self_attention=False,
         encoder_decoder_attention=False,
         dictionary=None,
@@ -75,15 +74,6 @@ class GTAttention(FairseqIncrementalDecoder):
         self.out_proj = quant_noise(
             nn.Linear(embed_dim, embed_dim, bias=bias), q_noise, qn_block_size
         )
-
-        if add_bias_kv:
-            self.bias_k = Parameter(torch.Tensor(1, 1, embed_dim))
-            self.bias_v = Parameter(torch.Tensor(1, 1, embed_dim))
-        else:
-            self.bias_k = self.bias_v = None
-
-        self.add_zero_attn = add_zero_attn
-        self.beam_size = 1
         self.reset_parameters()
 
     def reset_parameters(self):
@@ -101,10 +91,6 @@ class GTAttention(FairseqIncrementalDecoder):
         nn.init.xavier_uniform_(self.out_proj.weight)
         if self.out_proj.bias is not None:
             nn.init.constant_(self.out_proj.bias, 0.0)
-        if self.bias_k is not None:
-            nn.init.xavier_normal_(self.bias_k)
-        if self.bias_v is not None:
-            nn.init.xavier_normal_(self.bias_v)
 
     def _pad_masks(
         self,
@@ -124,42 +110,6 @@ class GTAttention(FairseqIncrementalDecoder):
                 dim=-1,
             )
         return key_padding_mask, attn_mask
-
-    def _add_bias(
-        self,
-        k: Tensor,
-        v: Tensor,
-        key_padding_mask: Optional[Tensor],
-        attn_mask: Optional[Tensor],
-        bsz: int,
-    ) -> Tuple[Tensor, Tensor, Optional[Tensor], Optional[Tensor]]:
-        assert self.bias_k is not None
-        assert self.bias_v is not None
-        k = torch.cat([k, self.bias_k.repeat(1, bsz, 1)])
-        v = torch.cat([v, self.bias_v.repeat(1, bsz, 1)])
-        key_padding_mask, attn_mask = self._pad_masks(
-            key_padding_mask=key_padding_mask, attn_mask=attn_mask
-        )
-        return k, v, key_padding_mask, attn_mask
-
-    def _append_zero_attn(
-        self,
-        k: Tensor,
-        v: Tensor,
-        key_padding_mask: Optional[Tensor],
-        attn_mask: Optional[Tensor],
-    ) -> Tuple[Tensor, Tensor, Optional[Tensor], Optional[Tensor]]:
-        zero_attn_shape = k.size()[:-2] + torch.Size([1]) + k.size()[-1:]
-        k = torch.cat(
-            [k, torch.zeros(zero_attn_shape, dtype=k.dtype, device=k.device)], dim=-2
-        )
-        v = torch.cat(
-            [v, torch.zeros(zero_attn_shape, dtype=v.dtype, device=v.device)], dim=-2
-        )
-        key_padding_mask, attn_mask = self._pad_masks(
-            key_padding_mask=key_padding_mask, attn_mask=attn_mask
-        )
-        return k, v, key_padding_mask, attn_mask
         
     def forward(
         self,
@@ -218,12 +168,6 @@ class GTAttention(FairseqIncrementalDecoder):
             k = self.k_proj(key)
             v = self.v_proj(value)
         q *= self.scaling
-
-        if self.bias_k is not None:
-            assert self.bias_v is not None
-            k, v, attn_mask, key_padding_mask = self._add_bias(
-                k, v, attn_mask, key_padding_mask, bsz
-            )
 
         q = (
             q.contiguous()
@@ -288,13 +232,6 @@ class GTAttention(FairseqIncrementalDecoder):
         if key_padding_mask is not None:
             assert key_padding_mask.size(0) == bsz
             assert key_padding_mask.size(1) == src_len
-
-        if self.add_zero_attn:
-            assert v is not None
-            src_len += 1
-            k, v, key_padding_mask, attn_mask = self._append_zero_attn(
-                k=k, v=v, key_padding_mask=key_padding_mask, attn_mask=attn_mask
-            )
 
         attn_weights = torch.bmm(q, k.transpose(1, 2))
 

@@ -172,7 +172,7 @@ class GTDecoderBase(FairseqIncrementalDecoder):
             )
 
     def build_decoder_layer(self, cfg, no_encoder_attn=False):
-        layer = GTDecoderLayer(cfg, no_encoder_attn)
+        layer = GTDecoderLayer(cfg, no_encoder_attn, self.max_target_positions)
         checkpoint = cfg.checkpoint_activations
         if checkpoint:
             offload_to_cpu = cfg.offload_activations
