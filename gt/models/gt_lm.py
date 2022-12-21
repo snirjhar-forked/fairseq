@@ -85,6 +85,12 @@ class GTLanguageModelConfig(FairseqDataclass):
             "help": "if set, disables positional embeddings (outside self attention)"
         },
     )
+    rpe_embedding_dim: int = field(
+        default=512,
+        metadata={
+            "help": "relative positional embedding dimension"
+        },
+    )
     share_decoder_input_output_embed: bool = field(
         default=False, metadata={"help": "share decoder input and output embeddings"}
     )

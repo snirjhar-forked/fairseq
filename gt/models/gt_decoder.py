@@ -21,12 +21,20 @@ from fairseq.modules import (
     LayerDropModuleList,
     LayerNorm,
     PositionalEmbedding,
-    SinusoidalPositionalEmbedding,
 )
+from .gt_rpe import ContinuousRPE
 from .gt_layer import GTDecoderLayer
 from fairseq.modules.checkpoint_activations import checkpoint_wrapper
 from fairseq.modules.quant_noise import quant_noise as apply_quant_noise_
 
+from dataclasses import dataclass, field
+
+@dataclass
+class GTDecoderConfig(TransformerConfig):
+    rpe_embedding_dim: int = field(
+        default=512,
+        metadata={"help": "embedding dimension for the RPE"},
+    )
 
 # rewrite name for backward compatibility in `make_generation_fast_`
 def module_name_fordropout(module_name: str) -> str:
@@ -104,6 +112,9 @@ class GTDecoderBase(FairseqIncrementalDecoder):
             if not cfg.no_token_positional_embeddings
             else None
         )
+        self.rpe_embedding_dim = cfg.rpe_embedding_dim
+        self.rpe_embed = ContinuousRPE(self.rpe_embedding_dim)
+        
         if cfg.layernorm_embedding:
             self.layernorm_embedding = LayerNorm(embed_dim, export=cfg.export)
         else:
@@ -295,6 +306,9 @@ class GTDecoderBase(FairseqIncrementalDecoder):
             positions = self.embed_positions(
                 prev_output_tokens, incremental_state=incremental_state
             )
+        
+        pairwise_ids, pairwise_table = self.rpe_embed(prev_output_tokens,
+                                                      incremental_state=incremental_state)
 
         if incremental_state is not None:
             prev_output_tokens = prev_output_tokens[:, -1:]
@@ -341,6 +355,8 @@ class GTDecoderBase(FairseqIncrementalDecoder):
                 enc,
                 padding_mask,
                 incremental_state,
+                pairwise_ids=pairwise_ids,
+                pairwise_table=pairwise_table,
                 self_attn_mask=self_attn_mask,
                 self_attn_padding_mask=self_attn_padding_mask,
                 need_attn=bool((idx == alignment_layer)),
@@ -417,7 +433,7 @@ class GTDecoder(GTDecoderBase):
     ):
         self.args = args
         super().__init__(
-            TransformerConfig.from_namespace(args),
+            GTDecoderConfig.from_namespace(args),
             dictionary,
             embed_tokens,
             no_encoder_attn=no_encoder_attn,
@@ -426,10 +442,10 @@ class GTDecoder(GTDecoderBase):
 
     def build_output_projection(self, args, dictionary, embed_tokens):
         super().build_output_projection(
-            TransformerConfig.from_namespace(args), dictionary, embed_tokens
+            GTDecoderConfig.from_namespace(args), dictionary, embed_tokens
         )
 
     def build_decoder_layer(self, args, no_encoder_attn=False):
         return super().build_decoder_layer(
-            TransformerConfig.from_namespace(args), no_encoder_attn=no_encoder_attn
+            GTDecoderConfig.from_namespace(args), no_encoder_attn=no_encoder_attn
         )

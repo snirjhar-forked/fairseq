@@ -27,6 +27,7 @@ class GTAttention(FairseqIncrementalDecoder):
         dropout=0.0,
         bias=True,
         max_positions=1024,
+        rpe_embedding_dim=512,
         self_attention=False,
         encoder_decoder_attention=False,
         dictionary=None,
@@ -44,6 +45,9 @@ class GTAttention(FairseqIncrementalDecoder):
         self.dropout_module = FairseqDropout(
             dropout, module_name=self.__class__.__name__
         )
+        
+        self.max_target_positions = max_positions
+        self.rpe_embedding_dim = rpe_embedding_dim
 
         self.head_dim = embed_dim // num_heads
         assert (
@@ -70,11 +74,16 @@ class GTAttention(FairseqIncrementalDecoder):
         self.q_proj = quant_noise(
             nn.Linear(embed_dim, embed_dim, bias=bias), q_noise, qn_block_size
         )
+        
+        self.rpe_proj = nn.Linear(rpe_embedding_dim, num_heads, bias=True)
 
         self.out_proj = quant_noise(
             nn.Linear(embed_dim, embed_dim, bias=bias), q_noise, qn_block_size
         )
         self.reset_parameters()
+        self.max_target_positions = max_positions
+        
+        
 
     def reset_parameters(self):
         if self.qkv_same_dim:
@@ -118,6 +127,8 @@ class GTAttention(FairseqIncrementalDecoder):
         value: Optional[Tensor],
         key_padding_mask: Optional[Tensor] = None,
         incremental_state: Optional[Dict[str, Dict[str, Optional[Tensor]]]] = None,
+        pairwise_ids: Optional[Tensor] = None,
+        pairwise_table: Optional[Tensor] = None,
         need_weights: bool = True,
         static_kv: bool = False,
         attn_mask: Optional[Tensor] = None,
@@ -234,8 +245,23 @@ class GTAttention(FairseqIncrementalDecoder):
             assert key_padding_mask.size(1) == src_len
 
         attn_weights = torch.bmm(q, k.transpose(1, 2))
+        
+        if pairwise_ids is not None:
+            assert pairwise_table is not None
+            projected_table = self.rpe_proj(pairwise_table)
+            # rpe_bias = F.embedding(pairwise_ids, projected_table) # [tgt_len, src_len, num_heads]
+            # rpe_bias = rpe_bias.movedim(-1, 0) # [num_heads, tgt_len, src_len]
+            rpe_bias = (projected_table.t()
+                                 .index_select(1, pairwise_ids.view(-1))
+                                 .view(self.num_heads, tgt_len, src_len)
+                        )
+            if attn_mask is not None:
+                rpe_bias += attn_mask
+            attn_weights = attn_weights.view(bsz, self.num_heads, tgt_len, src_len)
+            attn_weights += rpe_bias
+            attn_weights = attn_weights.view(bsz * self.num_heads, tgt_len, src_len)
 
-        if attn_mask is not None:
+        elif attn_mask is not None:
             attn_weights += attn_mask
 
         if key_padding_mask is not None:
@@ -348,4 +374,6 @@ class GTAttention(FairseqIncrementalDecoder):
         buffer: Dict[str, Optional[Tensor]],
     ):
         return self.set_incremental_state(incremental_state, "attn_state", buffer)
-
+    
+    def max_positions(self):
+        return self.max_target_positions
