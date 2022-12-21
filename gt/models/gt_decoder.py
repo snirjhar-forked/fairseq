@@ -279,7 +279,6 @@ class GTDecoderBase(FairseqIncrementalDecoder):
                 - the decoder's features of shape `(batch, tgt_len, embed_dim)`
                 - a dictionary with any model-specific outputs
         """
-        bs, slen = prev_output_tokens.size()
         if alignment_layer is None:
             alignment_layer = self.num_layers - 1
 
@@ -397,52 +396,6 @@ class GTDecoderBase(FairseqIncrementalDecoder):
         self._future_mask = self._future_mask.to(tensor)
         return self._future_mask[:dim, :dim]
 
-    def upgrade_state_dict_named(self, state_dict, name):
-        """Upgrade a (possibly old) state dict for new versions of fairseq."""
-        if isinstance(self.embed_positions, SinusoidalPositionalEmbedding):
-            weights_key = "{}.embed_positions.weights".format(name)
-            if weights_key in state_dict:
-                del state_dict[weights_key]
-            state_dict[
-                "{}.embed_positions._float_tensor".format(name)
-            ] = torch.FloatTensor(1)
-
-        if f"{name}.output_projection.weight" not in state_dict:
-            if self.share_input_output_embed:
-                embed_out_key = f"{name}.embed_tokens.weight"
-            else:
-                embed_out_key = f"{name}.embed_out"
-            if embed_out_key in state_dict:
-                state_dict[f"{name}.output_projection.weight"] = state_dict[
-                    embed_out_key
-                ]
-                if not self.share_input_output_embed:
-                    del state_dict[embed_out_key]
-
-        for i in range(self.num_layers):
-            # update layer norms
-            layer_norm_map = {
-                "0": "self_attn_layer_norm",
-                "1": "encoder_attn_layer_norm",
-                "2": "final_layer_norm",
-            }
-            for old, new in layer_norm_map.items():
-                for m in ("weight", "bias"):
-                    k = "{}.layers.{}.layer_norms.{}.{}".format(name, i, old, m)
-                    if k in state_dict:
-                        state_dict[
-                            "{}.layers.{}.{}.{}".format(name, i, new, m)
-                        ] = state_dict[k]
-                        del state_dict[k]
-
-        version_key = "{}.version".format(name)
-        if utils.item(state_dict.get(version_key, torch.Tensor([1]))[0]) <= 2:
-            # earlier checkpoints did not normalize after the stack of layers
-            self.layer_norm = None
-            self.normalize = False
-            state_dict[version_key] = torch.Tensor([1])
-
-        return state_dict
 
 
 def Linear(in_features, out_features, bias=True):

@@ -121,16 +121,7 @@ class GTDecoderLayer(nn.Module):
         )
 
     def build_encoder_attention(self, embed_dim, cfg):
-        return GTAttention(
-            embed_dim,
-            cfg.decoder.attention_heads,
-            kdim=cfg.encoder.embed_dim,
-            vdim=cfg.encoder.embed_dim,
-            dropout=cfg.attention_dropout,
-            encoder_decoder_attention=True,
-            q_noise=self.quant_noise,
-            qn_block_size=self.quant_noise_block_size,
-        )
+        raise NotImplementedError
 
     def prepare_for_onnx_export_(self):
         self.onnx_trace = True
