@@ -17,6 +17,11 @@ from fairseq.modules.quant_noise import quant_noise
 from fairseq.models.fairseq_incremental_decoder import FairseqIncrementalDecoder
 
 
+@torch.jit.script
+def sigmul2(x):
+    return torch.sigmoid(x) * 2
+
+
 class GTAttention(FairseqIncrementalDecoder):
     def __init__(
         self,
@@ -65,23 +70,15 @@ class GTAttention(FairseqIncrementalDecoder):
             "Self-attention requires query, key and " "value to be of the same size"
         )
 
-        self.k_proj = quant_noise(
-            nn.Linear(self.kdim, embed_dim, bias=bias), q_noise, qn_block_size
-        )
-        self.v_proj = quant_noise(
-            nn.Linear(self.vdim, embed_dim, bias=bias), q_noise, qn_block_size
-        )
-        self.q_proj = quant_noise(
-            nn.Linear(embed_dim, embed_dim, bias=bias), q_noise, qn_block_size
-        )
+        self.k_proj = nn.Linear(self.kdim, embed_dim, bias=bias)
+        self.v_proj = nn.Linear(self.vdim, embed_dim, bias=bias)
+        self.q_proj = nn.Linear(embed_dim, embed_dim, bias=bias)
+        self.w_proj = nn.Linear(self.kdim, embed_dim, bias=bias)
         
-        self.rpe_proj = nn.Linear(rpe_embedding_dim, num_heads, bias=True)
+        self.rpe_proj = nn.Linear(rpe_embedding_dim, num_heads*2, bias=True)
 
-        self.out_proj = quant_noise(
-            nn.Linear(embed_dim, embed_dim, bias=bias), q_noise, qn_block_size
-        )
+        self.out_proj = nn.Linear(embed_dim, embed_dim, bias=bias)
         self.reset_parameters()
-        self.max_target_positions = max_positions
         
         
 
@@ -125,10 +122,10 @@ class GTAttention(FairseqIncrementalDecoder):
         query: Tensor,
         key: Optional[Tensor],
         value: Optional[Tensor],
+        pairwise_table: Tensor,
+        pairwise_ids: Tensor,
         key_padding_mask: Optional[Tensor] = None,
         incremental_state: Optional[Dict[str, Dict[str, Optional[Tensor]]]] = None,
-        pairwise_ids: Optional[Tensor] = None,
-        pairwise_table: Optional[Tensor] = None,
         need_weights: bool = True,
         static_kv: bool = False,
         attn_mask: Optional[Tensor] = None,
@@ -173,10 +170,12 @@ class GTAttention(FairseqIncrementalDecoder):
             q = self.q_proj(query)
             k = self.k_proj(query)
             v = self.v_proj(query)
+            w = self.w_proj(query)
         else:
             assert key is not None and value is not None
             q = self.q_proj(query)
             k = self.k_proj(key)
+            w = self.w_proj(key)
             v = self.v_proj(value)
         q *= self.scaling
 
@@ -192,6 +191,11 @@ class GTAttention(FairseqIncrementalDecoder):
         )
         v = (
             v.contiguous()
+            .view(-1, bsz * self.num_heads, self.head_dim)
+            .transpose(0, 1)
+        )
+        w = (
+            w.contiguous()
             .view(-1, bsz * self.num_heads, self.head_dim)
             .transpose(0, 1)
         )
@@ -245,24 +249,24 @@ class GTAttention(FairseqIncrementalDecoder):
             assert key_padding_mask.size(1) == src_len
 
         attn_weights = torch.bmm(q, k.transpose(1, 2))
+        gate_weights = torch.bmm(q, w.transpose(1, 2))
         
-        if pairwise_ids is not None:
-            assert pairwise_table is not None
-            projected_table = self.rpe_proj(pairwise_table)
-            # rpe_bias = F.embedding(pairwise_ids, projected_table) # [tgt_len, src_len, num_heads]
-            # rpe_bias = rpe_bias.movedim(-1, 0) # [num_heads, tgt_len, src_len]
-            rpe_bias = (projected_table.t()
-                                 .index_select(1, pairwise_ids.view(-1))
-                                 .view(self.num_heads, tgt_len, src_len)
-                        )
-            if attn_mask is not None:
-                rpe_bias += attn_mask
-            attn_weights = attn_weights.view(bsz, self.num_heads, tgt_len, src_len)
-            attn_weights += rpe_bias
-            attn_weights = attn_weights.view(bsz * self.num_heads, tgt_len, src_len)
-
-        elif attn_mask is not None:
-            attn_weights += attn_mask
+        
+        projected_table = self.rpe_proj(pairwise_table)
+        # rpe_bias = F.embedding(pairwise_ids, projected_table) # [tgt_len, src_len, num_heads]
+        # rpe_bias = rpe_bias.movedim(-1, 0) # [num_heads, tgt_len, src_len]
+        rpe_x = (projected_table.t()
+                                .index_select(1, pairwise_ids.view(-1))
+                                .view(self.num_heads*2, tgt_len, src_len))
+        if attn_mask is not None:
+            rpe_x += attn_mask
+        rpe_bias, rpe_gates = rpe_x.chunk(2, dim=0)
+        attn_weights = attn_weights.view(bsz, self.num_heads, tgt_len, src_len)
+        gate_weights = gate_weights.view(bsz, self.num_heads, tgt_len, src_len)
+        attn_weights += rpe_bias
+        gate_weights += rpe_gates
+        attn_weights = attn_weights.view(bsz * self.num_heads, tgt_len, src_len)
+        gate_weights = gate_weights.view(bsz * self.num_heads, tgt_len, src_len)
 
         if key_padding_mask is not None:
             # don't attend to padding symbols
@@ -278,7 +282,7 @@ class GTAttention(FairseqIncrementalDecoder):
         if before_softmax:
             return attn_weights, v
 
-        attn_weights_float = F.softmax(attn_weights, dim=-1)
+        attn_weights_float = F.softmax(attn_weights, dim=-1)*sigmul2(gate_weights)
         attn_weights = attn_weights_float.type_as(attn_weights)
         attn_probs = self.dropout_module(attn_weights)
 
