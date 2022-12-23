@@ -36,7 +36,7 @@ class GTDecoderConfig(TransformerConfig):
         metadata={"help": "embedding dimension for the RPE"},
     )
     use_alibi: bool = field(
-        default=True,
+        default=False,
         metadata={"help": "use alibi"},
     )
 

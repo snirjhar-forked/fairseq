@@ -80,7 +80,7 @@ class GTLanguageModelConfig(FairseqDataclass):
         default=4, metadata={"help": "adaptive input factor"}
     )
     no_token_positional_embeddings: bool = field(
-        default=True,
+        default=False,
         metadata={
             "help": "if set, disables positional embeddings (outside self attention)"
         },
@@ -92,7 +92,7 @@ class GTLanguageModelConfig(FairseqDataclass):
         },
     )
     use_alibi: bool = field(
-        default=True,
+        default=False,
         metadata={
             "help": "use alibi"
         }
