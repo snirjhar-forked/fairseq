@@ -230,7 +230,14 @@ class GTAttention(FairseqIncrementalDecoder):
         attn_weights = torch.bmm(q, k.transpose(1, 2))
 
         if attn_mask is not None:
-            attn_weights += attn_mask
+            if attn_mask.ndim == 2:
+                attn_weights += attn_mask
+            elif attn_mask.ndim == 3:
+                attn_weights = attn_weights.view(bsz, self.num_heads, tgt_len, src_len)
+                attn_weights = attn_weights + attn_mask
+                attn_weights = attn_weights.view(bsz * self.num_heads, tgt_len, src_len)
+            else:
+                raise NotImplementedError
 
         if key_padding_mask is not None:
             # don't attend to padding symbols

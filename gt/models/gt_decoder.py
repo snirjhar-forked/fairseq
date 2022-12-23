@@ -79,6 +79,7 @@ class GTDecoderBase(FairseqIncrementalDecoder):
         )
         self.decoder_layerdrop = cfg.decoder.layerdrop
         self.share_input_output_embed = cfg.share_decoder_input_output_embed
+        self.decoder_attention_heads = cfg.decoder.attention_heads
 
         input_embed_dim = embed_tokens.embedding_dim
         embed_dim = cfg.decoder.embed_dim
@@ -155,6 +156,24 @@ class GTDecoderBase(FairseqIncrementalDecoder):
         self.output_projection = output_projection
         if self.output_projection is None:
             self.build_output_projection(cfg, dictionary, embed_tokens)
+        
+        self._uses_alibi = cfg.use_alibi
+        
+    def build_alibi(self, dim):
+        def get_slopes(n):
+            def get_slopes_power_of_2(n):
+                start = (2**(-2**-(math.log2(n)-3)))
+                ratio = start
+                return [start*ratio**i for i in range(n)]
+
+            if math.log2(n).is_integer():
+                return get_slopes_power_of_2(n)                   #In the paper, we only train models that have 2^a heads for some a. This function has
+            else:                                                 #some good properties that only occur when the input is a power of 2. To maintain that even
+                closest_power_of_2 = 2**math.floor(math.log2(n))  #when the number of heads is not a power of 2, we use this workaround. 
+                return get_slopes_power_of_2(closest_power_of_2) + get_slopes(2*closest_power_of_2)[0::2][:n-closest_power_of_2]
+ 
+        slopes = torch.Tensor(get_slopes(self.decoder_attention_heads))
+        return slopes.view(-1,1,1) * torch.arange(dim)
 
     def build_output_projection(self, cfg, dictionary, embed_tokens):
         if cfg.adaptive_softmax_cutoff is not None:
@@ -409,15 +428,18 @@ class GTDecoderBase(FairseqIncrementalDecoder):
         dim = tensor.size(0)
         # self._future_mask.device != tensor.device is not working in TorchScript. This is a workaround.
         if (
-            self._future_mask.size(0) == 0
+            self._future_mask.size(-1) == 0
             or (not self._future_mask.device == tensor.device)
-            or self._future_mask.size(0) < dim
+            or self._future_mask.size(-1) < dim
         ):
             self._future_mask = torch.triu(
                 utils.fill_with_neg_inf(torch.zeros([dim, dim])), 1
             )
+            if self._uses_alibi:
+                alibi = self.build_alibi(dim)
+                self._future_mask = alibi + self._future_mask
         self._future_mask = self._future_mask.to(tensor)
-        return self._future_mask[:dim, :dim]
+        return self._future_mask[...,:dim, :dim]
 
 
 
