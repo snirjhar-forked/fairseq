@@ -12,6 +12,7 @@ from torch import Tensor
 from fairseq import utils
 from fairseq.modules import LayerNorm
 from .gt_attention import GTAttention
+from .gt_attention_rpe import GTAttention as GTAttentionRPE
 from fairseq.modules.fairseq_dropout import FairseqDropout
 from fairseq.modules.quant_noise import quant_noise
 
@@ -28,6 +29,8 @@ class GTDecoderLayer(nn.Module):
         self.quant_noise_block_size = cfg.quant_noise.pq_block_size
 
         self.cross_self_attention = cfg.cross_self_attention
+        self.rpe_embedding_dim = cfg.rpe_embedding_dim
+        self._uses_rpe = (self.rpe_embedding_dim > 0)
 
         self.self_attn = self.build_self_attention(
             self.embed_dim,
@@ -110,16 +113,21 @@ class GTDecoderLayer(nn.Module):
     def build_self_attention(
         self, embed_dim, cfg, max_positions
     ):
-        return GTAttention(
-            embed_dim,
-            cfg.decoder.attention_heads,
+        AttentionLayer = GTAttentionRPE if self._uses_rpe else GTAttention
+        layer_config = dict(
+            embed_dim=embed_dim,
+            num_heads=cfg.decoder.attention_heads,
             dropout=cfg.attention_dropout,
             max_positions=max_positions,
-            rpe_embedding_dim=cfg.rpe_embedding_dim,
             self_attention=not cfg.cross_self_attention,
             q_noise=self.quant_noise,
             qn_block_size=self.quant_noise_block_size,
         )
+        if self._uses_rpe:
+            layer_config.update(
+                rpe_embedding_dim=cfg.rpe_embedding_dim,
+            )
+        return AttentionLayer(**layer_config)
 
     def build_encoder_attention(self, embed_dim, cfg):
         raise NotImplementedError
@@ -198,18 +206,22 @@ class GTDecoderLayer(nn.Module):
             y = torch.cat((encoder_out, x), dim=0)
         else:
             y = x
-
-        x, attn = self.self_attn(
+        
+        layer_inputs = dict(
             query=x,
             key=y,
             value=y,
             key_padding_mask=self_attn_padding_mask,
             incremental_state=incremental_state,
-            pairwise_ids=pairwise_ids,
-            pairwise_table=pairwise_table,
             need_weights=False,
             attn_mask=self_attn_mask,
         )
+        if self._uses_rpe:
+            layer_inputs.update(
+                pairwise_ids=pairwise_ids,
+                pairwise_table=pairwise_table,
+            )
+        x, attn = self.self_attn(**layer_inputs)
         if self.c_attn is not None:
             tgt_len, bsz = x.size(0), x.size(1)
             x = x.view(tgt_len, bsz, self.nh, self.head_dim)

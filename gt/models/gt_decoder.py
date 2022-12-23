@@ -32,8 +32,12 @@ from dataclasses import dataclass, field
 @dataclass
 class GTDecoderConfig(TransformerConfig):
     rpe_embedding_dim: int = field(
-        default=512,
+        default=0,
         metadata={"help": "embedding dimension for the RPE"},
+    )
+    use_alibi: bool = field(
+        default=True,
+        metadata={"help": "use alibi"},
     )
 
 # rewrite name for backward compatibility in `make_generation_fast_`
@@ -113,7 +117,9 @@ class GTDecoderBase(FairseqIncrementalDecoder):
             else None
         )
         self.rpe_embedding_dim = cfg.rpe_embedding_dim
-        self.rpe_embed = ContinuousRPE(self.rpe_embedding_dim)
+        self._uses_rpe = (self.rpe_embedding_dim > 0)
+        if self._uses_rpe:
+            self.rpe_embed = ContinuousRPE(self.rpe_embedding_dim)
         
         if cfg.layernorm_embedding:
             self.layernorm_embedding = LayerNorm(embed_dim, export=cfg.export)
@@ -306,9 +312,10 @@ class GTDecoderBase(FairseqIncrementalDecoder):
             positions = self.embed_positions(
                 prev_output_tokens, incremental_state=incremental_state
             )
-        
-        pairwise_ids, pairwise_table = self.rpe_embed(prev_output_tokens,
-                                                      incremental_state=incremental_state)
+        pairwise_ids, pairwise_table = None, None
+        if self._uses_rpe:
+            pairwise_ids, pairwise_table = self.rpe_embed(prev_output_tokens,
+                                                        incremental_state=incremental_state)
 
         if incremental_state is not None:
             prev_output_tokens = prev_output_tokens[:, -1:]

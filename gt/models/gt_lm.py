@@ -80,16 +80,22 @@ class GTLanguageModelConfig(FairseqDataclass):
         default=4, metadata={"help": "adaptive input factor"}
     )
     no_token_positional_embeddings: bool = field(
-        default=False,
+        default=True,
         metadata={
             "help": "if set, disables positional embeddings (outside self attention)"
         },
     )
     rpe_embedding_dim: int = field(
-        default=512,
+        default=0,
         metadata={
-            "help": "relative positional embedding dimension"
+            "help": "relative positional embedding dimension, 0 to disable"
         },
+    )
+    use_alibi: bool = field(
+        default=True,
+        metadata={
+            "help": "use alibi"
+        }
     )
     share_decoder_input_output_embed: bool = field(
         default=False, metadata={"help": "share decoder input and output embeddings"}
