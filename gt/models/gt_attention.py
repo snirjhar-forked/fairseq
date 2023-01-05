@@ -16,6 +16,8 @@ from fairseq.modules.fairseq_dropout import FairseqDropout
 from fairseq.modules.quant_noise import quant_noise
 from fairseq.models.fairseq_incremental_decoder import FairseqIncrementalDecoder
 
+from .utils import shuffled_indices
+
 
 class GTAttention(FairseqIncrementalDecoder):
     def __init__(
@@ -27,6 +29,10 @@ class GTAttention(FairseqIncrementalDecoder):
         dropout=0.0,
         bias=True,
         max_positions=1024,
+        num_windows=4,
+        shuffle_type='half_gaussian',
+        shuffle_size=0.25,
+        keep_ratio=1.0,
         self_attention=False,
         encoder_decoder_attention=False,
         dictionary=None,
@@ -53,7 +59,10 @@ class GTAttention(FairseqIncrementalDecoder):
 
         self.self_attention = self_attention
         self.encoder_decoder_attention = encoder_decoder_attention
-        
+        self.num_windows = num_windows
+        self.shuffle_type = shuffle_type
+        self.shuffle_size = shuffle_size
+        self.keep_ratio = keep_ratio
         assert not self.encoder_decoder_attention, (
             "Currently only self-attention is supported"
         )
@@ -140,6 +149,7 @@ class GTAttention(FairseqIncrementalDecoder):
             need_weights = True
 
         tgt_len, bsz, embed_dim = query.size()
+        tgt_len0 = tgt_len # save for later
         src_len = tgt_len
         assert list(query.size()) == [tgt_len, bsz, embed_dim]
         if key is not None:
@@ -153,14 +163,61 @@ class GTAttention(FairseqIncrementalDecoder):
         else:
             saved_state = None
         if self.self_attention:
-            q = self.q_proj(query)
-            k = self.k_proj(query)
-            v = self.v_proj(query)
+            key = value = query
         else:
             assert key is not None and value is not None
-            q = self.q_proj(query)
-            k = self.k_proj(key)
-            v = self.v_proj(value)
+        
+        if self.shuffle_type != "none" and self.training:
+            assert not torch.jit.is_scripting(), "Shuffle is not supported in scripting"
+            if src_len % self.num_windows != 0 or tgt_len % self.num_windows != 0:
+                tgt_padding = (0, 0, 0, 0, 0, self.num_windows - tgt_len % self.num_windows)
+                src_paddings = (0, 0, 0, 0, 0, self.num_windows - src_len % self.num_windows)
+                if (query is key) and (query is value):
+                    query = key = value = F.pad(query, src_paddings)
+                elif key is value:
+                    query = F.pad(query, tgt_padding)
+                    value = key = F.pad(key, src_paddings)
+                else:
+                    query = F.pad(query, tgt_padding)
+                    key = F.pad(key, src_paddings)
+                    value = F.pad(value, src_paddings)
+                if attn_mask is not None:
+                    mask_paddings = (0, self.num_windows - src_len % self.num_windows,
+                                     0, self.num_windows - tgt_len % self.num_windows)
+                    attn_mask = F.pad(attn_mask, mask_paddings,
+                                      value=-float("inf"))
+                if key_padding_mask is not None:
+                    key_mask_paddings = (0, self.num_windows - src_len % self.num_windows)
+                    key_padding_mask = F.pad(key_padding_mask, key_mask_paddings,
+                                             value=True)
+                tgt_len = query.size(0)
+                src_len = key.size(0)
+            # indices = torch.randperm(src_len, device=key.device)
+            # indices = torch.arange(src_len, device=key.device, dtype=torch.long)
+            indices = shuffled_indices(
+                shuffle_type=self.shuffle_type,
+                shuffle_size=self.shuffle_size,
+                input_dim=src_len,
+                num_blocks=self.num_windows,
+                keep_ratio=self.keep_ratio,
+            ).to(key.device)
+            if key is value:
+                key = value = key.index_select(0, indices)
+            else:
+                key = key.index_select(0, indices)
+                value = value.index_select(0, indices)
+            
+            if attn_mask is not None:
+                assert attn_mask.size(-1) == src_len, "attn_mask size must match input size"
+                attn_mask = attn_mask.index_select(-1, indices)
+            if key_padding_mask is not None:
+                assert key_padding_mask.size(-1) == src_len, "key_padding_mask size must match input size"
+                key_padding_mask = key_padding_mask.index_select(-1, indices)
+            src_len = key.size(0)
+        
+        q = self.q_proj(query)
+        k = self.k_proj(key)
+        v = self.v_proj(value)
         q *= self.scaling
 
         q = (
@@ -227,28 +284,39 @@ class GTAttention(FairseqIncrementalDecoder):
             assert key_padding_mask.size(0) == bsz
             assert key_padding_mask.size(1) == src_len
 
-        attn_weights = torch.bmm(q, k.transpose(1, 2))
+        if self.num_windows>1 and self.training:
+            q = q.view(bsz, self.num_heads, self.num_windows, -1, self.head_dim)
+            k = k.view(bsz, self.num_heads, self.num_windows, -1, self.head_dim)
+            v = v.view(bsz, self.num_heads, self.num_windows, -1, self.head_dim)
+        else:
+            q = q.view(bsz, self.num_heads, -1, self.head_dim)
+            k = k.view(bsz, self.num_heads, -1, self.head_dim)
+            v = v.view(bsz, self.num_heads, -1, self.head_dim)
+        attn_weights = q @ k.transpose(-1, -2)
 
         if attn_mask is not None:
-            if attn_mask.ndim == 2:
-                attn_weights += attn_mask
-            elif attn_mask.ndim == 3:
-                attn_weights = attn_weights.view(bsz, self.num_heads, tgt_len, src_len)
-                attn_weights = attn_weights + attn_mask
-                attn_weights = attn_weights.view(bsz * self.num_heads, tgt_len, src_len)
-            else:
-                raise NotImplementedError
+            if self.num_windows>1 and self.training:
+                mask_shape = attn_mask.size()
+                attn_mask = attn_mask.view(*mask_shape[:-2], self.num_windows,
+                                           mask_shape[-2]//self.num_windows,
+                                           self.num_windows,
+                                           mask_shape[-1]//self.num_windows).transpose(-3,-2)\
+                                        .contiguous().view(*mask_shape[:-2], 
+                                                            self.num_windows*self.num_windows,
+                                                            mask_shape[-2]//self.num_windows,
+                                                            mask_shape[-1]//self.num_windows)
+                attn_mask = attn_mask[...,::self.num_windows+1,:,:]
+            attn_weights += attn_mask
 
         if key_padding_mask is not None:
             # don't attend to padding symbols
-            attn_weights = attn_weights.view(bsz, self.num_heads, tgt_len, src_len)
-            attn_weights = attn_weights.masked_fill(
-                key_padding_mask.unsqueeze(1)
-                .unsqueeze(2)
-                .to(torch.bool),
-                float("-inf"),
-            )
-            attn_weights = attn_weights.view(bsz * self.num_heads, tgt_len, src_len)
+            if self.num_windows>1 and self.training:
+                key_padding_mask = key_padding_mask.view(bsz, 1, self.num_windows, 1, -1)
+            else:
+                key_padding_mask = key_padding_mask.unsqueeze(1).unsqueeze(2)
+            key_padding_mask = key_padding_mask.to(torch.bool)
+            attn_weights = attn_weights.masked_fill(key_padding_mask,
+                                                    float("-inf"))
 
         if before_softmax:
             return attn_weights, v
@@ -257,8 +325,8 @@ class GTAttention(FairseqIncrementalDecoder):
         attn_weights = attn_weights_float.type_as(attn_weights)
         attn_probs = self.dropout_module(attn_weights)
 
-        assert v is not None
-        attn = torch.bmm(attn_probs, v)
+        attn = attn_probs @ v
+        attn = attn.view(bsz*self.num_heads, tgt_len, self.head_dim)
         attn = attn.transpose(0, 1).contiguous().view(tgt_len, bsz, self.embed_dim)
         attn = self.out_proj(attn)
         
@@ -270,7 +338,10 @@ class GTAttention(FairseqIncrementalDecoder):
             if not need_head_weights:
                 # average attention weights over heads
                 attn_weights = attn_weights.mean(dim=0)
-
+        
+        if tgt_len0 != tgt_len:
+            attn = attn.narrow(0, 0, tgt_len0)
+        
         return attn, attn_weights
 
     @staticmethod
