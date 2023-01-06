@@ -16,10 +16,17 @@ from .gt_attention_rpe import GTAttention as GTAttentionRPE
 from fairseq.modules.fairseq_dropout import FairseqDropout
 from fairseq.modules.quant_noise import quant_noise
 
+def get_for_ith_layer(config, i):
+    assert isinstance(config, str)
+    config = eval(config)
+    if not isinstance(config, list):
+        return config
+    else:
+        return config[i]
 
 class GTDecoderLayer(nn.Module):
     def __init__(
-        self, cfg, no_encoder_attn=False, max_positions=1024):
+        self, cfg, i, no_encoder_attn=False, max_positions=1024):
         super().__init__()
         self.embed_dim = cfg.decoder.embed_dim
         self.dropout_module = FairseqDropout(
@@ -35,6 +42,7 @@ class GTDecoderLayer(nn.Module):
         self.self_attn = self.build_self_attention(
             self.embed_dim,
             cfg,
+            i,
             max_positions=max_positions,
         )
         self.attn_ln = (
@@ -111,7 +119,7 @@ class GTDecoderLayer(nn.Module):
         return quant_noise(nn.Linear(input_dim, output_dim), q_noise, qn_block_size)
 
     def build_self_attention(
-        self, embed_dim, cfg, max_positions
+        self, embed_dim, cfg, i, max_positions
     ):
         AttentionLayer = GTAttentionRPE if self._uses_rpe else GTAttention
         layer_config = dict(
@@ -122,6 +130,10 @@ class GTDecoderLayer(nn.Module):
             self_attention=not cfg.cross_self_attention,
             q_noise=self.quant_noise,
             qn_block_size=self.quant_noise_block_size,
+            num_windows=cfg.num_windows,
+            shuffle_type=cfg.shuffle_type,
+            shuffle_size=get_for_ith_layer(cfg.shuffle_size, i),
+            keep_ratio=get_for_ith_layer(cfg.keep_ratio, i),
         )
         if self._uses_rpe:
             layer_config.update(

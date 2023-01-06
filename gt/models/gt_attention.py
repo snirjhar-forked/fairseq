@@ -29,8 +29,8 @@ class GTAttention(FairseqIncrementalDecoder):
         dropout=0.0,
         bias=True,
         max_positions=1024,
-        num_windows=4,
-        shuffle_type='half_gaussian',
+        num_windows=1,
+        shuffle_type='none',
         shuffle_size=0.25,
         keep_ratio=1.0,
         self_attention=False,
@@ -56,7 +56,7 @@ class GTAttention(FairseqIncrementalDecoder):
             self.head_dim * num_heads == self.embed_dim
         ), "embed_dim must be divisible by num_heads"
         self.scaling = self.head_dim**-0.5
-
+        self.max_positions_ = max_positions
         self.self_attention = self_attention
         self.encoder_decoder_attention = encoder_decoder_attention
         self.num_windows = num_windows
@@ -420,4 +420,8 @@ class GTAttention(FairseqIncrementalDecoder):
         buffer: Dict[str, Optional[Tensor]],
     ):
         return self.set_incremental_state(incremental_state, "attn_state", buffer)
+    
+    def extra_repr(self) -> str:
+        return f'num_windows={self.num_windows}, shuffle_type={self.shuffle_type}, ' \
+               f'shuffle_size={self.shuffle_size}, keep_ratio={self.keep_ratio}'
 

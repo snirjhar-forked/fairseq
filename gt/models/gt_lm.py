@@ -97,6 +97,22 @@ class GTLanguageModelConfig(FairseqDataclass):
             "help": "use alibi"
         }
     )
+    num_windows: int = field(
+        default=1,
+        metadata={"help": "number of windows"},
+    )
+    shuffle_type: str = field(
+        default='none',
+        metadata={"help": "shuffle type"},
+    )
+    shuffle_size: str = field(
+        default="0.0",
+        metadata={"help": "shuffle size"},
+    )
+    keep_ratio: str = field(
+        default="1.0",
+        metadata={"help": "keep ratio"},
+    )
     share_decoder_input_output_embed: bool = field(
         default=False, metadata={"help": "share decoder input and output embeddings"}
     )

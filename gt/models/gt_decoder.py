@@ -39,6 +39,22 @@ class GTDecoderConfig(TransformerConfig):
         default=False,
         metadata={"help": "use alibi"},
     )
+    num_windows: int = field(
+        default=1,
+        metadata={"help": "number of windows"},
+    )
+    shuffle_type: str = field(
+        default='none',
+        metadata={"help": "shuffle type"},
+    )
+    shuffle_size: str = field(
+        default="0.0",
+        metadata={"help": "shuffle size"},
+    )
+    keep_ratio: str = field(
+        default="1.0",
+        metadata={"help": "keep ratio"},
+    )
 
 # rewrite name for backward compatibility in `make_generation_fast_`
 def module_name_fordropout(module_name: str) -> str:
@@ -135,8 +151,8 @@ class GTDecoderBase(FairseqIncrementalDecoder):
             self.layers = nn.ModuleList([])
         self.layers.extend(
             [
-                self.build_decoder_layer(cfg, no_encoder_attn)
-                for _ in range(cfg.decoder.layers)
+                self.build_decoder_layer(cfg, i, no_encoder_attn)
+                for i in range(cfg.decoder.layers)
             ]
         )
         self.num_layers = len(self.layers)
@@ -207,8 +223,8 @@ class GTDecoderBase(FairseqIncrementalDecoder):
                 BaseLayer(cfg),
             )
 
-    def build_decoder_layer(self, cfg, no_encoder_attn=False):
-        layer = GTDecoderLayer(cfg, no_encoder_attn, self.max_target_positions)
+    def build_decoder_layer(self, cfg, i, no_encoder_attn=False):
+        layer = GTDecoderLayer(cfg, i, no_encoder_attn, self.max_target_positions)
         checkpoint = cfg.checkpoint_activations
         if checkpoint:
             offload_to_cpu = cfg.offload_activations
@@ -474,7 +490,7 @@ class GTDecoder(GTDecoderBase):
             GTDecoderConfig.from_namespace(args), dictionary, embed_tokens
         )
 
-    def build_decoder_layer(self, args, no_encoder_attn=False):
+    def build_decoder_layer(self, args, i, no_encoder_attn=False):
         return super().build_decoder_layer(
-            GTDecoderConfig.from_namespace(args), no_encoder_attn=no_encoder_attn
+            GTDecoderConfig.from_namespace(args), i, no_encoder_attn=no_encoder_attn
         )
