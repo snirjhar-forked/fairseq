@@ -47,6 +47,7 @@ class GTAttention(FairseqIncrementalDecoder):
         self.qkv_same_dim = self.kdim == embed_dim and self.vdim == embed_dim
 
         self.num_heads = num_heads
+        self.dropout = dropout
         self.dropout_module = FairseqDropout(
             dropout, module_name=self.__class__.__name__
         )
@@ -422,6 +423,7 @@ class GTAttention(FairseqIncrementalDecoder):
         return self.set_incremental_state(incremental_state, "attn_state", buffer)
     
     def extra_repr(self) -> str:
-        return f'num_windows={self.num_windows}, shuffle_type={self.shuffle_type}, ' \
+        return f'attention_dropout={self.dropout}, ' \
+               f'num_windows={self.num_windows}, shuffle_type={self.shuffle_type}, ' \
                f'shuffle_size={self.shuffle_size}, keep_ratio={self.keep_ratio}'
 
