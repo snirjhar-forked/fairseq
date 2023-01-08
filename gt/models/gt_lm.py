@@ -420,6 +420,52 @@ def gt_lm_baevski_wiki103(args):
     gt_lm_big(args)
 
 
+@register_model_architecture("gt_lm", "gt_lm_wiki103_new")
+@register_model_architecture("gt_lm", "gt_lm_baevski_wiki103_new")
+def gt_lm_baevski_wiki103_new(args):
+    args.decoder_layers = safe_getattr(args, "decoder_layers", 16)
+    args.decoder_attention_heads = safe_getattr(args, "decoder_attention_heads", 8)
+    args.dropout = safe_getattr(args, "dropout", 0.3)
+    args.adaptive_input = safe_getattr(args, "adaptive_input", True)
+    args.tie_adaptive_weights = safe_getattr(args, "tie_adaptive_weights", True)
+    args.adaptive_input_cutoff = safe_getattr(
+        args, "adaptive_input_cutoff", "20000,60000"
+    )
+    args.adaptive_softmax_cutoff = safe_getattr(
+        args, "adaptive_softmax_cutoff", "20000,60000"
+    )
+    args.adaptive_softmax_dropout = safe_getattr(args, "adaptive_softmax_dropout", 0.2)
+    args.attention_dropout = safe_getattr(args, "attention_dropout", 0.1)
+    args.activation_dropout = safe_getattr(args, "activation_dropout", 0.1)
+    # args.no_decoder_final_norm = safe_getattr(args, "no_decoder_final_norm", True)
+    args.activation_fn = safe_getattr(args, "activation_fn", "gelu")
+    args.tie_adaptive_proj = safe_getattr(args, "tie_adaptive_proj", True)
+    gt_lm_big(args)
+
+@register_model_architecture("gt_lm", "gt_lm_enwik8")
+def gt_lm_enwik8(args):
+    args.decoder_layers = safe_getattr(args, "decoder_layers", 16)
+    args.decoder_attention_heads = safe_getattr(args, "decoder_attention_heads", 8)
+    args.dropout = safe_getattr(args, "dropout", 0.3)
+    args.adaptive_softmax_dropout = safe_getattr(args, "adaptive_softmax_dropout", 0.2)
+    args.attention_dropout = safe_getattr(args, "attention_dropout", 0.1)
+    args.activation_dropout = safe_getattr(args, "activation_dropout", 0.1)
+    args.no_decoder_final_norm = safe_getattr(args, "no_decoder_final_norm", True)
+    args.activation_fn = safe_getattr(args, "activation_fn", "gelu")
+    gt_lm_big(args)
+
+@register_model_architecture("gt_lm", "gt_lm_enwik8_new")
+def gt_lm_enwik8_new(args):
+    args.decoder_layers = safe_getattr(args, "decoder_layers", 16)
+    args.decoder_attention_heads = safe_getattr(args, "decoder_attention_heads", 8)
+    args.dropout = safe_getattr(args, "dropout", 0.3)
+    args.adaptive_softmax_dropout = safe_getattr(args, "adaptive_softmax_dropout", 0.2)
+    args.attention_dropout = safe_getattr(args, "attention_dropout", 0.1)
+    args.activation_dropout = safe_getattr(args, "activation_dropout", 0.1)
+    # args.no_decoder_final_norm = safe_getattr(args, "no_decoder_final_norm", True)
+    args.activation_fn = safe_getattr(args, "activation_fn", "gelu")
+    gt_lm_big(args)
+
 @register_model_architecture("gt_lm", "gt_lm_gbw")
 @register_model_architecture("gt_lm", "gt_lm_baevski_gbw")
 def gt_lm_baevski_gbw(args):
@@ -515,7 +561,7 @@ def gt_lm_gpt2_bigger(args):
 
 
 def base_gpt3_architecture(args):
-    args.decoder_input_dim = args.decoder_embed_dim
+    args.decoder_input_dim = args.decoder_embed_dimactivation_fn
     args.decoder_output_dim = args.decoder_embed_dim
     args.decoder_ffn_embed_dim = safe_getattr(
         args, "decoder_ffn_embed_dim", args.decoder_embed_dim * 4
