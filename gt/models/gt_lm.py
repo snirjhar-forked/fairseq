@@ -466,6 +466,19 @@ def gt_lm_enwik8_new(args):
     args.activation_fn = safe_getattr(args, "activation_fn", "gelu")
     gt_lm_big(args)
 
+
+@register_model_architecture("gt_lm", "gt_lm_cifar10_new")
+def gt_lm_cifar10_new(args):
+    args.decoder_layers = safe_getattr(args, "decoder_layers", 16)
+    args.decoder_attention_heads = safe_getattr(args, "decoder_attention_heads", 8)
+    args.dropout = safe_getattr(args, "dropout", 0.3)
+    args.adaptive_softmax_dropout = safe_getattr(args, "adaptive_softmax_dropout", 0.2)
+    args.attention_dropout = safe_getattr(args, "attention_dropout", 0.1)
+    args.activation_dropout = safe_getattr(args, "activation_dropout", 0.1)
+    # args.no_decoder_final_norm = safe_getattr(args, "no_decoder_final_norm", True)
+    args.activation_fn = safe_getattr(args, "activation_fn", "gelu")
+    gt_lm_big(args)
+
 @register_model_architecture("gt_lm", "gt_lm_gbw")
 @register_model_architecture("gt_lm", "gt_lm_baevski_gbw")
 def gt_lm_baevski_gbw(args):
