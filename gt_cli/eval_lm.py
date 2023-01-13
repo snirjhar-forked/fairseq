@@ -25,6 +25,26 @@ from fairseq.logging import progress_bar
 from fairseq.logging.meters import StopwatchMeter
 from .sequence_scorer import SequenceScorer
 
+from fairseq.dataclass.utils import gen_parser_from_dataclass
+from dataclasses import dataclass, field
+from fairseq.dataclass import FairseqDataclass
+
+@dataclass
+class SelfEnsembleConfig(FairseqDataclass):
+    self_ensemble_samples: int = field(
+        default=0, metadata={"help": "number of self-ensemble samples"}
+    )
+
+def add_self_ensemble_args(parser):
+    group = parser.add_argument_group("Self Ensemble")
+    gen_parser_from_dataclass(group, SelfEnsembleConfig())
+
+def get_parser():
+    parser = options.get_eval_lm_parser()
+    add_self_ensemble_args(parser)
+    return parser
+
+
 logging.basicConfig(
     format="%(asctime)s | %(levelname)s | %(name)s | %(message)s",
     datefmt="%Y-%m-%d %H:%M:%S",
@@ -45,6 +65,7 @@ def eval_lm(
     softmax_batch: int = 0,
     remove_bos_token: bool = False,
     device: Optional[torch.device] = None,
+    self_ensemble_samples: int = 0,
 ):
     """
     Args:
@@ -80,7 +101,8 @@ def eval_lm(
         device = next(models[0].parameters()).device
 
     gen_timer = StopwatchMeter()
-    scorer = SequenceScorer(target_dictionary, softmax_batch)
+    scorer = SequenceScorer(target_dictionary, softmax_batch,
+                            self_ensemble_samples=self_ensemble_samples)
 
     score_sum = 0.0
     count = 0
@@ -233,13 +255,14 @@ class WordStat(object):
         )
 
 
-def main(cfg: DictConfig, **unused_kwargs):
+def main(cfg: DictConfig, self_ensemble_samples, **unused_kwargs):
     if isinstance(cfg, Namespace):
         cfg = convert_namespace_to_omegaconf(cfg)
 
     utils.import_user_module(cfg.common)
 
     logger.info(cfg)
+    print('self_ensemble_samples =', self_ensemble_samples)
 
     if cfg.eval_lm.context_window > 0:
         # reduce tokens per sample by the required context window size
@@ -325,6 +348,7 @@ def main(cfg: DictConfig, **unused_kwargs):
         target_dictionary=task.target_dictionary,
         softmax_batch=cfg.eval_lm.softmax_batch,
         remove_bos_token=getattr(cfg.task, "add_bos_token", False),
+        self_ensemble_samples=self_ensemble_samples,
     )
 
     logger.info(
@@ -337,10 +361,11 @@ def main(cfg: DictConfig, **unused_kwargs):
 
 
 def cli_main():
-    parser = options.get_eval_lm_parser()
+    parser = get_parser()
     args = options.parse_args_and_arch(parser)
-
-    distributed_utils.call_main(convert_namespace_to_omegaconf(args), main)
+    self_ensemble_samples = args.self_ensemble_samples
+    distributed_utils.call_main(convert_namespace_to_omegaconf(args), main,
+                                self_ensemble_samples=self_ensemble_samples)
 
 
 if __name__ == "__main__":

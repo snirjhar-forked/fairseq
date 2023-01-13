@@ -19,6 +19,7 @@ class SequenceScorer(object):
         compute_alignment=False,
         eos=None,
         symbols_to_strip_from_output=None,
+        self_ensemble_samples=0,
     ):
         self.pad = tgt_dict.pad()
         self.eos = tgt_dict.eos() if eos is None else eos
@@ -30,6 +31,7 @@ class SequenceScorer(object):
             if symbols_to_strip_from_output is not None
             else {self.eos}
         )
+        self.self_ensemble_samples = self_ensemble_samples
         print('Initializing Custom SequenceScorer')
 
     @torch.no_grad()
@@ -64,8 +66,13 @@ class SequenceScorer(object):
         # compute scores for each model in the ensemble
         avg_probs = None
         avg_attn = None
+        if self.self_ensemble_samples > 0:
+            models = models * self.self_ensemble_samples
         for model in models:
-            model.train()
+            if self.self_ensemble_samples > 0:
+                model.train()
+            else:
+                model.eval()
             decoder_out = model(**net_input)
             attn = decoder_out[1] if len(decoder_out) > 1 else None
             if type(attn) is dict:
