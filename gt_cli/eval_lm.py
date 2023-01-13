@@ -271,7 +271,7 @@ def main(cfg: DictConfig, **unused_kwargs):
             model.half()
         if use_cuda and not cfg.distributed_training.pipeline_model_parallel:
             model.cuda()
-        model.prepare_for_inference_(cfg)
+        # model.prepare_for_inference_(cfg)
 
     assert len(models) > 0
 
