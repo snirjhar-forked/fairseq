@@ -24,6 +24,18 @@ def get_for_ith_layer(config, i):
     else:
         return config[i]
 
+def get_for_ith_layer_macro(config, i):
+    assert isinstance(config, str)
+    if not config.startswith('$'):
+        return config
+    else:
+        config = config[1:]
+    config = eval(config)
+    if not isinstance(config, list):
+        return config
+    else:
+        return config[i]
+
 class GTDecoderLayer(nn.Module):
     def __init__(
         self, cfg, i, no_encoder_attn=False, max_positions=1024):
@@ -122,6 +134,10 @@ class GTDecoderLayer(nn.Module):
         self, embed_dim, cfg, i, max_positions
     ):
         AttentionLayer = GTAttentionRPE if self._uses_rpe else GTAttention
+        shuffle_type = get_for_ith_layer_macro(cfg.shuffle_type, i)
+        shuffle_size = 0.0 if shuffle_type=='none' else get_for_ith_layer(cfg.shuffle_size, i)
+        keep_ratio = 1.0 if shuffle_type=='none' else  get_for_ith_layer(cfg.keep_ratio, i)
+        num_windows = 1 if shuffle_type=='none' else cfg.num_windows
         layer_config = dict(
             embed_dim=embed_dim,
             num_heads=cfg.decoder.attention_heads,
@@ -130,10 +146,10 @@ class GTDecoderLayer(nn.Module):
             self_attention=not cfg.cross_self_attention,
             q_noise=self.quant_noise,
             qn_block_size=self.quant_noise_block_size,
-            num_windows=cfg.num_windows,
-            shuffle_type=cfg.shuffle_type,
-            shuffle_size=get_for_ith_layer(cfg.shuffle_size, i),
-            keep_ratio=get_for_ith_layer(cfg.keep_ratio, i),
+            num_windows=num_windows,
+            shuffle_type=shuffle_type,
+            shuffle_size=shuffle_size,
+            keep_ratio=keep_ratio,
         )
         if self._uses_rpe:
             layer_config.update(
