@@ -466,6 +466,16 @@ def gt_lm_enwik8_new(args):
     args.activation_fn = safe_getattr(args, "activation_fn", "gelu")
     gt_lm_big(args)
 
+@register_model_architecture("gt_lm", "gt_lm_enwik8_large_new")
+def gt_lm_enwik8_new(args):
+    args.decoder_layers = safe_getattr(args, "decoder_layers", 24)
+    args.decoder_attention_heads = safe_getattr(args, "decoder_attention_heads", 8)
+    args.dropout = safe_getattr(args, "dropout", 0.3)
+    args.attention_dropout = safe_getattr(args, "attention_dropout", 0.1)
+    args.activation_dropout = safe_getattr(args, "activation_dropout", 0.1)
+    args.activation_fn = safe_getattr(args, "activation_fn", "gelu")
+    gt_lm_big(args)
+
 
 @register_model_architecture("gt_lm", "gt_lm_cifar10_new")
 def gt_lm_cifar10_new(args):
