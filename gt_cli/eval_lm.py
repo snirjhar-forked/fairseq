@@ -21,7 +21,7 @@ from omegaconf import DictConfig
 import fairseq
 from fairseq import checkpoint_utils, distributed_utils, options, tasks, utils
 from fairseq.dataclass.utils import convert_namespace_to_omegaconf
-from fairseq.logging import progress_bar
+from tqdm import tqdm
 from fairseq.logging.meters import StopwatchMeter
 from .sequence_scorer import SequenceScorer
 
@@ -331,33 +331,31 @@ def main(cfg: DictConfig, self_ensemble_samples, **unused_kwargs):
         context_window=cfg.eval_lm.context_window,
     )
 
-    itr = progress_bar.progress_bar(
-        itr,
-        log_format=cfg.common.log_format,
-        log_interval=cfg.common.log_interval,
-        default_log_format=("tqdm" if not cfg.common.no_progress_bar else "simple"),
-    )
-
-    results = eval_lm(
-        models=models,
-        source_dictionary=task.source_dictionary,
-        batch_iterator=itr,
-        post_process=cfg.common_eval.post_process,
-        output_word_probs=cfg.eval_lm.output_word_probs,
-        output_word_stats=cfg.eval_lm.output_word_stats,
-        target_dictionary=task.target_dictionary,
-        softmax_batch=cfg.eval_lm.softmax_batch,
-        remove_bos_token=getattr(cfg.task, "add_bos_token", False),
-        self_ensemble_samples=self_ensemble_samples,
-    )
-
-    logger.info(
-        "Loss (base 2): {:.4f}, Perplexity: {:.2f}".format(
-            results["loss"], results["perplexity"]
+    itr = tqdm(itr, file=sys.stdout)
+    try:
+        results = eval_lm(
+            models=models,
+            source_dictionary=task.source_dictionary,
+            batch_iterator=itr,
+            post_process=cfg.common_eval.post_process,
+            output_word_probs=cfg.eval_lm.output_word_probs,
+            output_word_stats=cfg.eval_lm.output_word_stats,
+            target_dictionary=task.target_dictionary,
+            softmax_batch=cfg.eval_lm.softmax_batch,
+            remove_bos_token=getattr(cfg.task, "add_bos_token", False),
+            self_ensemble_samples=self_ensemble_samples,
         )
-    )
 
-    return results
+        msg = (
+            "Loss (base 2): {:.4f}, Perplexity: {:.2f}".format(
+                results["loss"], results["perplexity"]
+            )
+        )
+        logger.info(msg)
+        print(msg)
+        return results
+    finally:
+        itr.close()
 
 
 def cli_main():
