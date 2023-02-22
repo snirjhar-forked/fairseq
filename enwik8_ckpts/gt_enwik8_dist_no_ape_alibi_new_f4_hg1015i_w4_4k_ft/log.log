@@ -1,0 +1,416 @@
+{'_name': None, 'common': {'_name': None, 'no_progress_bar': False, 'log_interval': 100, 'log_format': None, 'log_file': 'checkpoints/gt_enwik8_dist_no_ape_alibi_new_f4_hg1015i_w4_4k_ft/log.log', 'aim_repo': None, 'aim_run_hash': None, 'tensorboard_logdir': None, 'wandb_project': None, 'azureml_logging': False, 'seed': 1, 'cpu': False, 'tpu': False, 'bf16': False, 'memory_efficient_bf16': False, 'fp16': True, 'memory_efficient_fp16': False, 'fp16_no_flatten_grads': False, 'fp16_init_scale': 1, 'fp16_scale_window': None, 'fp16_scale_tolerance': 0.0, 'on_cpu_convert_precision': False, 'min_loss_scale': 0.0001, 'threshold_loss_scale': None, 'amp': False, 'amp_batch_retries': 2, 'amp_init_scale': 128, 'amp_scale_window': None, 'user_dir': './gt/', 'empty_cache_freq': 0, 'all_gather_list_size': 16384, 'model_parallel_size': 1, 'quantization_config_path': None, 'profile': False, 'reset_logging': False, 'suppress_crashes': False, 'use_plasma_view': False, 'plasma_path': '/tmp/plasma'}, 'common_eval': {'_name': None, 'path': None, 'post_process': None, 'quiet': False, 'model_overrides': '{}', 'results_path': None}, 'distributed_training': {'_name': None, 'distributed_world_size': 32, 'distributed_num_procs': 8, 'distributed_rank': 0, 'distributed_backend': 'nccl', 'distributed_init_method': 'env://', 'distributed_port': -1, 'device_id': 0, 'distributed_no_spawn': True, 'ddp_backend': 'pytorch_ddp', 'ddp_comm_hook': 'none', 'bucket_cap_mb': 25, 'fix_batches_to_gpus': False, 'find_unused_parameters': False, 'gradient_as_bucket_view': False, 'fast_stat_sync': False, 'heartbeat_timeout': -1, 'broadcast_buffers': False, 'slowmo_momentum': None, 'slowmo_base_algorithm': 'localsgd', 'localsgd_frequency': 3, 'nprocs_per_node': 8, 'pipeline_model_parallel': False, 'pipeline_balance': None, 'pipeline_devices': None, 'pipeline_chunks': 0, 'pipeline_encoder_balance': None, 'pipeline_encoder_devices': None, 'pipeline_decoder_balance': None, 'pipeline_decoder_devices': None, 'pipeline_checkpoint': 'never', 'zero_sharding': 'none', 'fp16': True, 'memory_efficient_fp16': False, 'tpu': False, 'no_reshard_after_forward': False, 'fp32_reduce_scatter': False, 'cpu_offload': False, 'use_sharded_state': False, 'not_fsdp_flatten_parameters': False}, 'dataset': {'_name': None, 'num_workers': 1, 'skip_invalid_size_inputs_valid_test': False, 'max_tokens': 8192, 'batch_size': None, 'required_batch_size_multiple': 8, 'required_seq_len_multiple': 1, 'dataset_impl': None, 'data_buffer_size': 10, 'train_subset': 'train', 'valid_subset': 'valid', 'combine_valid_subsets': None, 'ignore_unused_valid_subsets': False, 'validate_interval': 1, 'validate_interval_updates': 0, 'validate_after_updates': 0, 'fixed_validation_seed': None, 'disable_validation': False, 'max_tokens_valid': 8192, 'batch_size_valid': None, 'max_valid_steps': None, 'curriculum': 0, 'gen_subset': 'test', 'num_shards': 1, 'shard_id': 0, 'grouped_shuffling': False, 'update_epoch_batch_itr': False, 'update_ordered_indices_seed': False}, 'optimization': {'_name': None, 'max_epoch': 0, 'max_update': 16000, 'stop_time_hours': 0.0, 'clip_norm': 0.1, 'sentence_avg': False, 'update_freq': [1], 'lr': [0.001], 'stop_min_lr': 1e-09, 'use_bmuf': False, 'skip_remainder_batch': False}, 'checkpoint': {'_name': None, 'save_dir': 'checkpoints/gt_enwik8_dist_no_ape_alibi_new_f4_hg1015i_w4_4k_ft', 'restore_file': 'checkpoints/gt_enwik8_dist_no_ape_alibi_new_f4_hg1015i_w4_4k/checkpoint21.pt', 'continue_once': None, 'finetune_from_model': None, 'reset_dataloader': False, 'reset_lr_scheduler': False, 'reset_meters': False, 'reset_optimizer': False, 'optimizer_overrides': '{}', 'save_interval': 1, 'save_interval_updates': 0, 'keep_interval_updates': -1, 'keep_interval_updates_pattern': -1, 'keep_last_epochs': -1, 'keep_best_checkpoints': -1, 'no_save': False, 'no_epoch_checkpoints': False, 'no_last_checkpoints': False, 'no_save_optimizer_state': False, 'best_checkpoint_metric': 'loss', 'maximize_best_checkpoint_metric': False, 'patience': -1, 'checkpoint_suffix': '', 'checkpoint_shard_count': 1, 'load_checkpoint_on_all_dp_ranks': False, 'write_checkpoints_asynchronously': False, 'model_parallel_size': 1}, 'bmuf': {'_name': None, 'block_lr': 1.0, 'block_momentum': 0.875, 'global_sync_iter': 50, 'warmup_iterations': 500, 'use_nbm': False, 'average_sync': False, 'distributed_world_size': 8}, 'generation': {'_name': None, 'beam': 5, 'beam_mt': 0, 'nbest': 1, 'max_len_a': 0.0, 'max_len_b': 200, 'max_len_a_mt': 0.0, 'max_len_b_mt': 200, 'min_len': 1, 'match_source_len': False, 'unnormalized': False, 'no_early_stop': False, 'no_beamable_mm': False, 'lenpen': 1.0, 'lenpen_mt': 1.0, 'unkpen': 0.0, 'replace_unk': None, 'sacrebleu': False, 'score_reference': False, 'prefix_size': 0, 'no_repeat_ngram_size': 0, 'sampling': False, 'sampling_topk': -1, 'sampling_topp': -1.0, 'constraints': None, 'temperature': 1.0, 'diverse_beam_groups': -1, 'diverse_beam_strength': 0.5, 'diversity_rate': -1.0, 'print_alignment': None, 'print_step': False, 'lm_path': None, 'lm_weight': 0.0, 'iter_decode_eos_penalty': 0.0, 'iter_decode_max_iter': 10, 'iter_decode_force_max_iter': False, 'iter_decode_with_beam': 1, 'iter_decode_with_external_reranker': False, 'retain_iter_history': False, 'retain_dropout': False, 'retain_dropout_modules': None, 'decoding_format': None, 'no_seed_provided': False, 'eos_token': None}, 'eval_lm': {'_name': None, 'output_word_probs': False, 'output_word_stats': False, 'context_window': 0, 'softmax_batch': 9223372036854775807}, 'interactive': {'_name': None, 'buffer_size': 0, 'input': '-'}, 'model': {'_name': 'gt_lm_enwik8_new', 'activation_fn': gelu, 'dropout': 0.3, 'attention_dropout': 0.1, 'activation_dropout': 0.1, 'relu_dropout': 0.0, 'decoder_embed_dim': 1024, 'decoder_output_dim': 1024, 'decoder_input_dim': 1024, 'decoder_ffn_embed_dim': 4096, 'decoder_layers': 16, 'decoder_attention_heads': 8, 'decoder_normalize_before': True, 'no_decoder_final_norm': False, 'adaptive_softmax_cutoff': None, 'adaptive_softmax_dropout': 0.2, 'adaptive_softmax_factor': 4.0, 'no_token_positional_embeddings': True, 'rpe_embedding_dim': 0, 'use_alibi': True, 'num_windows': 1, 'shuffle_type': 'none', 'shuffle_size': '0.0', 'keep_ratio': '1.0', 'share_decoder_input_output_embed': False, 'character_embeddings': False, 'character_filters': '[(1, 64), (2, 128), (3, 192), (4, 256), (5, 256), (6, 256), (7, 256)]', 'character_embedding_dim': 4, 'char_embedder_highway_layers': 2, 'adaptive_input': False, 'adaptive_input_factor': 4.0, 'adaptive_input_cutoff': None, 'tie_adaptive_weights': False, 'tie_adaptive_proj': False, 'decoder_learned_pos': False, 'layernorm_embedding': False, 'no_scale_embedding': False, 'checkpoint_activations': False, 'offload_activations': False, 'decoder_layerdrop': 0.0, 'decoder_layers_to_keep': None, 'quant_noise_pq': 0.0, 'quant_noise_pq_block_size': 8, 'quant_noise_scalar': 0.0, 'min_params_to_wrap': 100000000, 'base_layers': 0, 'base_sublayers': 1, 'base_shuffle': 0, 'scale_fc': False, 'scale_attn': False, 'scale_heads': False, 'scale_resids': False, 'decoder_xformers_att_config': None, 'add_bos_token': False, 'tokens_per_sample': 4096, 'max_target_positions': None, 'tpu': False}, 'task': {'_name': 'language_modeling', 'data': 'data-bin/enwik8', 'sample_break_mode': none, 'tokens_per_sample': 4096, 'output_dictionary_size': -1, 'self_target': False, 'future_target': False, 'past_target': False, 'add_bos_token': False, 'max_target_positions': None, 'shorten_method': none, 'shorten_data_split_list': '', 'pad_to_fixed_length': False, 'pad_to_fixed_bsz': False, 'seed': 1, 'batch_size': None, 'batch_size_valid': None, 'dataset_impl': None, 'data_buffer_size': 10, 'tpu': False, 'use_plasma_view': False, 'plasma_path': '/tmp/plasma'}, 'criterion': {'_name': 'cross_entropy', 'sentence_avg': False}, 'optimizer': {'_name': 'adam', 'adam_betas': [0.9, 0.999], 'adam_eps': 1e-08, 'weight_decay': 0.0, 'use_old_adam': False, 'fp16_adam_stats': False, 'tpu': False, 'lr': [0.001]}, 'lr_scheduler': {'_name': 'cosine', 'warmup_updates': 4000, 'warmup_init_lr': 1e-06, 'lr': [0.001], 'min_lr': 1e-06, 't_mult': 2.0, 'lr_period_updates': 12000.0, 'lr_shrink': 0.75, 'max_update': 16000}, 'scoring': {'_name': 'bleu', 'pad': 1, 'eos': 2, 'unk': 3}, 'bpe': None, 'tokenizer': None, 'ema': {'_name': None, 'store_ema': False, 'ema_decay': 0.9999, 'ema_start_update': 0, 'ema_seed_model': None, 'ema_update_freq': 1, 'ema_fp32': False}}
+GTLanguageModel(
+  (decoder): GTDecoder(
+    (dropout_module): FairseqDropout()
+    (embed_tokens): Embedding(208, 1024, padding_idx=1)
+    (layers): ModuleList(
+      (0): GTDecoderLayer(
+        (dropout_module): FairseqDropout()
+        (self_attn): GTAttention(
+          attention_dropout=0.1, num_windows=1, shuffle_type=none, shuffle_size=0.0, keep_ratio=1.0
+          (dropout_module): FairseqDropout()
+          (k_proj): Linear(in_features=1024, out_features=1024, bias=True)
+          (v_proj): Linear(in_features=1024, out_features=1024, bias=True)
+          (q_proj): Linear(in_features=1024, out_features=1024, bias=True)
+          (out_proj): Linear(in_features=1024, out_features=1024, bias=True)
+        )
+        (activation_dropout_module): FairseqDropout()
+        (self_attn_layer_norm): FusedLayerNorm(torch.Size([1024]), eps=1e-05, elementwise_affine=True)
+        (fc1): Linear(in_features=1024, out_features=4096, bias=True)
+        (fc2): Linear(in_features=4096, out_features=1024, bias=True)
+        (final_layer_norm): FusedLayerNorm(torch.Size([1024]), eps=1e-05, elementwise_affine=True)
+      )
+      (1): GTDecoderLayer(
+        (dropout_module): FairseqDropout()
+        (self_attn): GTAttention(
+          attention_dropout=0.1, num_windows=1, shuffle_type=none, shuffle_size=0.0, keep_ratio=1.0
+          (dropout_module): FairseqDropout()
+          (k_proj): Linear(in_features=1024, out_features=1024, bias=True)
+          (v_proj): Linear(in_features=1024, out_features=1024, bias=True)
+          (q_proj): Linear(in_features=1024, out_features=1024, bias=True)
+          (out_proj): Linear(in_features=1024, out_features=1024, bias=True)
+        )
+        (activation_dropout_module): FairseqDropout()
+        (self_attn_layer_norm): FusedLayerNorm(torch.Size([1024]), eps=1e-05, elementwise_affine=True)
+        (fc1): Linear(in_features=1024, out_features=4096, bias=True)
+        (fc2): Linear(in_features=4096, out_features=1024, bias=True)
+        (final_layer_norm): FusedLayerNorm(torch.Size([1024]), eps=1e-05, elementwise_affine=True)
+      )
+      (2): GTDecoderLayer(
+        (dropout_module): FairseqDropout()
+        (self_attn): GTAttention(
+          attention_dropout=0.1, num_windows=1, shuffle_type=none, shuffle_size=0.0, keep_ratio=1.0
+          (dropout_module): FairseqDropout()
+          (k_proj): Linear(in_features=1024, out_features=1024, bias=True)
+          (v_proj): Linear(in_features=1024, out_features=1024, bias=True)
+          (q_proj): Linear(in_features=1024, out_features=1024, bias=True)
+          (out_proj): Linear(in_features=1024, out_features=1024, bias=True)
+        )
+        (activation_dropout_module): FairseqDropout()
+        (self_attn_layer_norm): FusedLayerNorm(torch.Size([1024]), eps=1e-05, elementwise_affine=True)
+        (fc1): Linear(in_features=1024, out_features=4096, bias=True)
+        (fc2): Linear(in_features=4096, out_features=1024, bias=True)
+        (final_layer_norm): FusedLayerNorm(torch.Size([1024]), eps=1e-05, elementwise_affine=True)
+      )
+      (3): GTDecoderLayer(
+        (dropout_module): FairseqDropout()
+        (self_attn): GTAttention(
+          attention_dropout=0.1, num_windows=1, shuffle_type=none, shuffle_size=0.0, keep_ratio=1.0
+          (dropout_module): FairseqDropout()
+          (k_proj): Linear(in_features=1024, out_features=1024, bias=True)
+          (v_proj): Linear(in_features=1024, out_features=1024, bias=True)
+          (q_proj): Linear(in_features=1024, out_features=1024, bias=True)
+          (out_proj): Linear(in_features=1024, out_features=1024, bias=True)
+        )
+        (activation_dropout_module): FairseqDropout()
+        (self_attn_layer_norm): FusedLayerNorm(torch.Size([1024]), eps=1e-05, elementwise_affine=True)
+        (fc1): Linear(in_features=1024, out_features=4096, bias=True)
+        (fc2): Linear(in_features=4096, out_features=1024, bias=True)
+        (final_layer_norm): FusedLayerNorm(torch.Size([1024]), eps=1e-05, elementwise_affine=True)
+      )
+      (4): GTDecoderLayer(
+        (dropout_module): FairseqDropout()
+        (self_attn): GTAttention(
+          attention_dropout=0.1, num_windows=1, shuffle_type=none, shuffle_size=0.0, keep_ratio=1.0
+          (dropout_module): FairseqDropout()
+          (k_proj): Linear(in_features=1024, out_features=1024, bias=True)
+          (v_proj): Linear(in_features=1024, out_features=1024, bias=True)
+          (q_proj): Linear(in_features=1024, out_features=1024, bias=True)
+          (out_proj): Linear(in_features=1024, out_features=1024, bias=True)
+        )
+        (activation_dropout_module): FairseqDropout()
+        (self_attn_layer_norm): FusedLayerNorm(torch.Size([1024]), eps=1e-05, elementwise_affine=True)
+        (fc1): Linear(in_features=1024, out_features=4096, bias=True)
+        (fc2): Linear(in_features=4096, out_features=1024, bias=True)
+        (final_layer_norm): FusedLayerNorm(torch.Size([1024]), eps=1e-05, elementwise_affine=True)
+      )
+      (5): GTDecoderLayer(
+        (dropout_module): FairseqDropout()
+        (self_attn): GTAttention(
+          attention_dropout=0.1, num_windows=1, shuffle_type=none, shuffle_size=0.0, keep_ratio=1.0
+          (dropout_module): FairseqDropout()
+          (k_proj): Linear(in_features=1024, out_features=1024, bias=True)
+          (v_proj): Linear(in_features=1024, out_features=1024, bias=True)
+          (q_proj): Linear(in_features=1024, out_features=1024, bias=True)
+          (out_proj): Linear(in_features=1024, out_features=1024, bias=True)
+        )
+        (activation_dropout_module): FairseqDropout()
+        (self_attn_layer_norm): FusedLayerNorm(torch.Size([1024]), eps=1e-05, elementwise_affine=True)
+        (fc1): Linear(in_features=1024, out_features=4096, bias=True)
+        (fc2): Linear(in_features=4096, out_features=1024, bias=True)
+        (final_layer_norm): FusedLayerNorm(torch.Size([1024]), eps=1e-05, elementwise_affine=True)
+      )
+      (6): GTDecoderLayer(
+        (dropout_module): FairseqDropout()
+        (self_attn): GTAttention(
+          attention_dropout=0.1, num_windows=1, shuffle_type=none, shuffle_size=0.0, keep_ratio=1.0
+          (dropout_module): FairseqDropout()
+          (k_proj): Linear(in_features=1024, out_features=1024, bias=True)
+          (v_proj): Linear(in_features=1024, out_features=1024, bias=True)
+          (q_proj): Linear(in_features=1024, out_features=1024, bias=True)
+          (out_proj): Linear(in_features=1024, out_features=1024, bias=True)
+        )
+        (activation_dropout_module): FairseqDropout()
+        (self_attn_layer_norm): FusedLayerNorm(torch.Size([1024]), eps=1e-05, elementwise_affine=True)
+        (fc1): Linear(in_features=1024, out_features=4096, bias=True)
+        (fc2): Linear(in_features=4096, out_features=1024, bias=True)
+        (final_layer_norm): FusedLayerNorm(torch.Size([1024]), eps=1e-05, elementwise_affine=True)
+      )
+      (7): GTDecoderLayer(
+        (dropout_module): FairseqDropout()
+        (self_attn): GTAttention(
+          attention_dropout=0.1, num_windows=1, shuffle_type=none, shuffle_size=0.0, keep_ratio=1.0
+          (dropout_module): FairseqDropout()
+          (k_proj): Linear(in_features=1024, out_features=1024, bias=True)
+          (v_proj): Linear(in_features=1024, out_features=1024, bias=True)
+          (q_proj): Linear(in_features=1024, out_features=1024, bias=True)
+          (out_proj): Linear(in_features=1024, out_features=1024, bias=True)
+        )
+        (activation_dropout_module): FairseqDropout()
+        (self_attn_layer_norm): FusedLayerNorm(torch.Size([1024]), eps=1e-05, elementwise_affine=True)
+        (fc1): Linear(in_features=1024, out_features=4096, bias=True)
+        (fc2): Linear(in_features=4096, out_features=1024, bias=True)
+        (final_layer_norm): FusedLayerNorm(torch.Size([1024]), eps=1e-05, elementwise_affine=True)
+      )
+      (8): GTDecoderLayer(
+        (dropout_module): FairseqDropout()
+        (self_attn): GTAttention(
+          attention_dropout=0.1, num_windows=1, shuffle_type=none, shuffle_size=0.0, keep_ratio=1.0
+          (dropout_module): FairseqDropout()
+          (k_proj): Linear(in_features=1024, out_features=1024, bias=True)
+          (v_proj): Linear(in_features=1024, out_features=1024, bias=True)
+          (q_proj): Linear(in_features=1024, out_features=1024, bias=True)
+          (out_proj): Linear(in_features=1024, out_features=1024, bias=True)
+        )
+        (activation_dropout_module): FairseqDropout()
+        (self_attn_layer_norm): FusedLayerNorm(torch.Size([1024]), eps=1e-05, elementwise_affine=True)
+        (fc1): Linear(in_features=1024, out_features=4096, bias=True)
+        (fc2): Linear(in_features=4096, out_features=1024, bias=True)
+        (final_layer_norm): FusedLayerNorm(torch.Size([1024]), eps=1e-05, elementwise_affine=True)
+      )
+      (9): GTDecoderLayer(
+        (dropout_module): FairseqDropout()
+        (self_attn): GTAttention(
+          attention_dropout=0.1, num_windows=1, shuffle_type=none, shuffle_size=0.0, keep_ratio=1.0
+          (dropout_module): FairseqDropout()
+          (k_proj): Linear(in_features=1024, out_features=1024, bias=True)
+          (v_proj): Linear(in_features=1024, out_features=1024, bias=True)
+          (q_proj): Linear(in_features=1024, out_features=1024, bias=True)
+          (out_proj): Linear(in_features=1024, out_features=1024, bias=True)
+        )
+        (activation_dropout_module): FairseqDropout()
+        (self_attn_layer_norm): FusedLayerNorm(torch.Size([1024]), eps=1e-05, elementwise_affine=True)
+        (fc1): Linear(in_features=1024, out_features=4096, bias=True)
+        (fc2): Linear(in_features=4096, out_features=1024, bias=True)
+        (final_layer_norm): FusedLayerNorm(torch.Size([1024]), eps=1e-05, elementwise_affine=True)
+      )
+      (10): GTDecoderLayer(
+        (dropout_module): FairseqDropout()
+        (self_attn): GTAttention(
+          attention_dropout=0.1, num_windows=1, shuffle_type=none, shuffle_size=0.0, keep_ratio=1.0
+          (dropout_module): FairseqDropout()
+          (k_proj): Linear(in_features=1024, out_features=1024, bias=True)
+          (v_proj): Linear(in_features=1024, out_features=1024, bias=True)
+          (q_proj): Linear(in_features=1024, out_features=1024, bias=True)
+          (out_proj): Linear(in_features=1024, out_features=1024, bias=True)
+        )
+        (activation_dropout_module): FairseqDropout()
+        (self_attn_layer_norm): FusedLayerNorm(torch.Size([1024]), eps=1e-05, elementwise_affine=True)
+        (fc1): Linear(in_features=1024, out_features=4096, bias=True)
+        (fc2): Linear(in_features=4096, out_features=1024, bias=True)
+        (final_layer_norm): FusedLayerNorm(torch.Size([1024]), eps=1e-05, elementwise_affine=True)
+      )
+      (11): GTDecoderLayer(
+        (dropout_module): FairseqDropout()
+        (self_attn): GTAttention(
+          attention_dropout=0.1, num_windows=1, shuffle_type=none, shuffle_size=0.0, keep_ratio=1.0
+          (dropout_module): FairseqDropout()
+          (k_proj): Linear(in_features=1024, out_features=1024, bias=True)
+          (v_proj): Linear(in_features=1024, out_features=1024, bias=True)
+          (q_proj): Linear(in_features=1024, out_features=1024, bias=True)
+          (out_proj): Linear(in_features=1024, out_features=1024, bias=True)
+        )
+        (activation_dropout_module): FairseqDropout()
+        (self_attn_layer_norm): FusedLayerNorm(torch.Size([1024]), eps=1e-05, elementwise_affine=True)
+        (fc1): Linear(in_features=1024, out_features=4096, bias=True)
+        (fc2): Linear(in_features=4096, out_features=1024, bias=True)
+        (final_layer_norm): FusedLayerNorm(torch.Size([1024]), eps=1e-05, elementwise_affine=True)
+      )
+      (12): GTDecoderLayer(
+        (dropout_module): FairseqDropout()
+        (self_attn): GTAttention(
+          attention_dropout=0.1, num_windows=1, shuffle_type=none, shuffle_size=0.0, keep_ratio=1.0
+          (dropout_module): FairseqDropout()
+          (k_proj): Linear(in_features=1024, out_features=1024, bias=True)
+          (v_proj): Linear(in_features=1024, out_features=1024, bias=True)
+          (q_proj): Linear(in_features=1024, out_features=1024, bias=True)
+          (out_proj): Linear(in_features=1024, out_features=1024, bias=True)
+        )
+        (activation_dropout_module): FairseqDropout()
+        (self_attn_layer_norm): FusedLayerNorm(torch.Size([1024]), eps=1e-05, elementwise_affine=True)
+        (fc1): Linear(in_features=1024, out_features=4096, bias=True)
+        (fc2): Linear(in_features=4096, out_features=1024, bias=True)
+        (final_layer_norm): FusedLayerNorm(torch.Size([1024]), eps=1e-05, elementwise_affine=True)
+      )
+      (13): GTDecoderLayer(
+        (dropout_module): FairseqDropout()
+        (self_attn): GTAttention(
+          attention_dropout=0.1, num_windows=1, shuffle_type=none, shuffle_size=0.0, keep_ratio=1.0
+          (dropout_module): FairseqDropout()
+          (k_proj): Linear(in_features=1024, out_features=1024, bias=True)
+          (v_proj): Linear(in_features=1024, out_features=1024, bias=True)
+          (q_proj): Linear(in_features=1024, out_features=1024, bias=True)
+          (out_proj): Linear(in_features=1024, out_features=1024, bias=True)
+        )
+        (activation_dropout_module): FairseqDropout()
+        (self_attn_layer_norm): FusedLayerNorm(torch.Size([1024]), eps=1e-05, elementwise_affine=True)
+        (fc1): Linear(in_features=1024, out_features=4096, bias=True)
+        (fc2): Linear(in_features=4096, out_features=1024, bias=True)
+        (final_layer_norm): FusedLayerNorm(torch.Size([1024]), eps=1e-05, elementwise_affine=True)
+      )
+      (14): GTDecoderLayer(
+        (dropout_module): FairseqDropout()
+        (self_attn): GTAttention(
+          attention_dropout=0.1, num_windows=1, shuffle_type=none, shuffle_size=0.0, keep_ratio=1.0
+          (dropout_module): FairseqDropout()
+          (k_proj): Linear(in_features=1024, out_features=1024, bias=True)
+          (v_proj): Linear(in_features=1024, out_features=1024, bias=True)
+          (q_proj): Linear(in_features=1024, out_features=1024, bias=True)
+          (out_proj): Linear(in_features=1024, out_features=1024, bias=True)
+        )
+        (activation_dropout_module): FairseqDropout()
+        (self_attn_layer_norm): FusedLayerNorm(torch.Size([1024]), eps=1e-05, elementwise_affine=True)
+        (fc1): Linear(in_features=1024, out_features=4096, bias=True)
+        (fc2): Linear(in_features=4096, out_features=1024, bias=True)
+        (final_layer_norm): FusedLayerNorm(torch.Size([1024]), eps=1e-05, elementwise_affine=True)
+      )
+      (15): GTDecoderLayer(
+        (dropout_module): FairseqDropout()
+        (self_attn): GTAttention(
+          attention_dropout=0.1, num_windows=1, shuffle_type=none, shuffle_size=0.0, keep_ratio=1.0
+          (dropout_module): FairseqDropout()
+          (k_proj): Linear(in_features=1024, out_features=1024, bias=True)
+          (v_proj): Linear(in_features=1024, out_features=1024, bias=True)
+          (q_proj): Linear(in_features=1024, out_features=1024, bias=True)
+          (out_proj): Linear(in_features=1024, out_features=1024, bias=True)
+        )
+        (activation_dropout_module): FairseqDropout()
+        (self_attn_layer_norm): FusedLayerNorm(torch.Size([1024]), eps=1e-05, elementwise_affine=True)
+        (fc1): Linear(in_features=1024, out_features=4096, bias=True)
+        (fc2): Linear(in_features=4096, out_features=1024, bias=True)
+        (final_layer_norm): FusedLayerNorm(torch.Size([1024]), eps=1e-05, elementwise_affine=True)
+      )
+    )
+    (layer_norm): FusedLayerNorm(torch.Size([1024]), eps=1e-05, elementwise_affine=True)
+    (output_projection): Linear(in_features=1024, out_features=208, bias=False)
+  )
+)
+task: LanguageModelingTask
+model: GTLanguageModel
+criterion: CrossEntropyCriterion
+num. shared model params: 201,967,616 (num. trained: 201,967,616)
+num. expert model params: 0 (num. trained: 0)
+training on 32 devices (GPUs/TPUs)
+max tokens per device = 8192 and max sentences per device = None
+begin dry-run validation on "valid" subset
+Start iterating over samples
+begin validation on "valid" subset
+epoch 022 | valid on 'valid' subset | loss 1.086 | ppl 2.12 | wps 1.27516e+06 | wpb 250000 | bsz 61.1 | num_updates 7560 | best_loss 1.086
+end of epoch 22 (average epoch stats below)
+epoch 022 | loss 0.978 | ppl 1.97 | wps 430651 | ups 1.65 | wpb 261628 | bsz 63.9 | num_updates 7560 | lr 0.000798314 | gnorm 0.07 | clip 0 | loss_scale 8 | train_wall 195 | gb_free 1.5 | wall 216
+Start iterating over samples
+begin validation on "valid" subset
+epoch 023 | valid on 'valid' subset | loss 1.084 | ppl 2.12 | wps 1.2723e+06 | wpb 250000 | bsz 61.1 | num_updates 7903 | best_loss 1.084
+epoch 023 | valid on 'valid' subset | loss 1.084 | ppl 2.12 | wps 1.2723e+06 | wpb 250000 | bsz 61.1 | num_updates 7903 | best_loss 1.084
+end of epoch 23 (average epoch stats below)
+epoch 023 | loss 0.963 | ppl 1.95 | wps 428094 | ups 1.64 | wpb 261626 | bsz 63.9 | num_updates 7903 | lr 0.000761153 | gnorm 0.069 | clip 0 | loss_scale 8 | train_wall 194 | gb_free 1.5 | wall 426
+epoch 023 | loss 0.963 | ppl 1.95 | wps 428094 | ups 1.64 | wpb 261626 | bsz 63.9 | num_updates 7903 | lr 0.000761153 | gnorm 0.069 | clip 0 | loss_scale 8 | train_wall 194 | gb_free 1.5 | wall 426
+Start iterating over samples
+begin validation on "valid" subset
+epoch 024 | valid on 'valid' subset | loss 1.076 | ppl 2.11 | wps 1.27373e+06 | wpb 250000 | bsz 61.1 | num_updates 8246 | best_loss 1.076
+epoch 024 | valid on 'valid' subset | loss 1.076 | ppl 2.11 | wps 1.27373e+06 | wpb 250000 | bsz 61.1 | num_updates 8246 | best_loss 1.076
+epoch 024 | valid on 'valid' subset | loss 1.076 | ppl 2.11 | wps 1.27373e+06 | wpb 250000 | bsz 61.1 | num_updates 8246 | best_loss 1.076
+end of epoch 24 (average epoch stats below)
+epoch 024 | loss 0.95 | ppl 1.93 | wps 427906 | ups 1.64 | wpb 261626 | bsz 63.9 | num_updates 8246 | lr 0.000721892 | gnorm 0.068 | clip 0 | loss_scale 4 | train_wall 195 | gb_free 1.5 | wall 635
+epoch 024 | loss 0.95 | ppl 1.93 | wps 427906 | ups 1.64 | wpb 261626 | bsz 63.9 | num_updates 8246 | lr 0.000721892 | gnorm 0.068 | clip 0 | loss_scale 4 | train_wall 195 | gb_free 1.5 | wall 635
+epoch 024 | loss 0.95 | ppl 1.93 | wps 427906 | ups 1.64 | wpb 261626 | bsz 63.9 | num_updates 8246 | lr 0.000721892 | gnorm 0.068 | clip 0 | loss_scale 4 | train_wall 195 | gb_free 1.5 | wall 635
+Start iterating over samples
+begin validation on "valid" subset
+epoch 025 | valid on 'valid' subset | loss 1.081 | ppl 2.12 | wps 1.27407e+06 | wpb 250000 | bsz 61.1 | num_updates 8590 | best_loss 1.076
+epoch 025 | valid on 'valid' subset | loss 1.081 | ppl 2.12 | wps 1.27407e+06 | wpb 250000 | bsz 61.1 | num_updates 8590 | best_loss 1.076
+epoch 025 | valid on 'valid' subset | loss 1.081 | ppl 2.12 | wps 1.27407e+06 | wpb 250000 | bsz 61.1 | num_updates 8590 | best_loss 1.076
+epoch 025 | valid on 'valid' subset | loss 1.081 | ppl 2.12 | wps 1.27407e+06 | wpb 250000 | bsz 61.1 | num_updates 8590 | best_loss 1.076
+end of epoch 25 (average epoch stats below)
+epoch 025 | loss 0.937 | ppl 1.91 | wps 433288 | ups 1.66 | wpb 261628 | bsz 63.9 | num_updates 8590 | lr 0.000680725 | gnorm 0.066 | clip 0 | loss_scale 8 | train_wall 195 | gb_free 1.5 | wall 843
+epoch 025 | loss 0.937 | ppl 1.91 | wps 433288 | ups 1.66 | wpb 261628 | bsz 63.9 | num_updates 8590 | lr 0.000680725 | gnorm 0.066 | clip 0 | loss_scale 8 | train_wall 195 | gb_free 1.5 | wall 843
+epoch 025 | loss 0.937 | ppl 1.91 | wps 433288 | ups 1.66 | wpb 261628 | bsz 63.9 | num_updates 8590 | lr 0.000680725 | gnorm 0.066 | clip 0 | loss_scale 8 | train_wall 195 | gb_free 1.5 | wall 843
+epoch 025 | loss 0.937 | ppl 1.91 | wps 433288 | ups 1.66 | wpb 261628 | bsz 63.9 | num_updates 8590 | lr 0.000680725 | gnorm 0.066 | clip 0 | loss_scale 8 | train_wall 195 | gb_free 1.5 | wall 843
+Start iterating over samples
+begin validation on "valid" subset
+epoch 026 | valid on 'valid' subset | loss 1.081 | ppl 2.12 | wps 1.27329e+06 | wpb 250000 | bsz 61.1 | num_updates 8933 | best_loss 1.076
+epoch 026 | valid on 'valid' subset | loss 1.081 | ppl 2.12 | wps 1.27329e+06 | wpb 250000 | bsz 61.1 | num_updates 8933 | best_loss 1.076
+epoch 026 | valid on 'valid' subset | loss 1.081 | ppl 2.12 | wps 1.27329e+06 | wpb 250000 | bsz 61.1 | num_updates 8933 | best_loss 1.076
+epoch 026 | valid on 'valid' subset | loss 1.081 | ppl 2.12 | wps 1.27329e+06 | wpb 250000 | bsz 61.1 | num_updates 8933 | best_loss 1.076
+epoch 026 | valid on 'valid' subset | loss 1.081 | ppl 2.12 | wps 1.27329e+06 | wpb 250000 | bsz 61.1 | num_updates 8933 | best_loss 1.076
+end of epoch 26 (average epoch stats below)
+epoch 026 | loss 0.924 | ppl 1.9 | wps 432105 | ups 1.65 | wpb 261626 | bsz 63.9 | num_updates 8933 | lr 0.000638223 | gnorm 0.065 | clip 0 | loss_scale 4 | train_wall 195 | gb_free 1.5 | wall 1051
+epoch 026 | loss 0.924 | ppl 1.9 | wps 432105 | ups 1.65 | wpb 261626 | bsz 63.9 | num_updates 8933 | lr 0.000638223 | gnorm 0.065 | clip 0 | loss_scale 4 | train_wall 195 | gb_free 1.5 | wall 1051
+epoch 026 | loss 0.924 | ppl 1.9 | wps 432105 | ups 1.65 | wpb 261626 | bsz 63.9 | num_updates 8933 | lr 0.000638223 | gnorm 0.065 | clip 0 | loss_scale 4 | train_wall 195 | gb_free 1.5 | wall 1051
+epoch 026 | loss 0.924 | ppl 1.9 | wps 432105 | ups 1.65 | wpb 261626 | bsz 63.9 | num_updates 8933 | lr 0.000638223 | gnorm 0.065 | clip 0 | loss_scale 4 | train_wall 195 | gb_free 1.5 | wall 1051
+epoch 026 | loss 0.924 | ppl 1.9 | wps 432105 | ups 1.65 | wpb 261626 | bsz 63.9 | num_updates 8933 | lr 0.000638223 | gnorm 0.065 | clip 0 | loss_scale 4 | train_wall 195 | gb_free 1.5 | wall 1051
+Start iterating over samples
+begin validation on "valid" subset
+epoch 027 | valid on 'valid' subset | loss 1.084 | ppl 2.12 | wps 1.27241e+06 | wpb 250000 | bsz 61.1 | num_updates 9277 | best_loss 1.076
+epoch 027 | valid on 'valid' subset | loss 1.084 | ppl 2.12 | wps 1.27241e+06 | wpb 250000 | bsz 61.1 | num_updates 9277 | best_loss 1.076
+epoch 027 | valid on 'valid' subset | loss 1.084 | ppl 2.12 | wps 1.27241e+06 | wpb 250000 | bsz 61.1 | num_updates 9277 | best_loss 1.076
+epoch 027 | valid on 'valid' subset | loss 1.084 | ppl 2.12 | wps 1.27241e+06 | wpb 250000 | bsz 61.1 | num_updates 9277 | best_loss 1.076
+epoch 027 | valid on 'valid' subset | loss 1.084 | ppl 2.12 | wps 1.27241e+06 | wpb 250000 | bsz 61.1 | num_updates 9277 | best_loss 1.076
+epoch 027 | valid on 'valid' subset | loss 1.084 | ppl 2.12 | wps 1.27241e+06 | wpb 250000 | bsz 61.1 | num_updates 9277 | best_loss 1.076
+end of epoch 27 (average epoch stats below)
+epoch 027 | loss 0.911 | ppl 1.88 | wps 433378 | ups 1.66 | wpb 261628 | bsz 63.9 | num_updates 9277 | lr 0.000594482 | gnorm 0.064 | clip 0 | loss_scale 8 | train_wall 195 | gb_free 1.5 | wall 1258
+epoch 027 | loss 0.911 | ppl 1.88 | wps 433378 | ups 1.66 | wpb 261628 | bsz 63.9 | num_updates 9277 | lr 0.000594482 | gnorm 0.064 | clip 0 | loss_scale 8 | train_wall 195 | gb_free 1.5 | wall 1258
+epoch 027 | loss 0.911 | ppl 1.88 | wps 433378 | ups 1.66 | wpb 261628 | bsz 63.9 | num_updates 9277 | lr 0.000594482 | gnorm 0.064 | clip 0 | loss_scale 8 | train_wall 195 | gb_free 1.5 | wall 1258
+epoch 027 | loss 0.911 | ppl 1.88 | wps 433378 | ups 1.66 | wpb 261628 | bsz 63.9 | num_updates 9277 | lr 0.000594482 | gnorm 0.064 | clip 0 | loss_scale 8 | train_wall 195 | gb_free 1.5 | wall 1258
+epoch 027 | loss 0.911 | ppl 1.88 | wps 433378 | ups 1.66 | wpb 261628 | bsz 63.9 | num_updates 9277 | lr 0.000594482 | gnorm 0.064 | clip 0 | loss_scale 8 | train_wall 195 | gb_free 1.5 | wall 1258
+epoch 027 | loss 0.911 | ppl 1.88 | wps 433378 | ups 1.66 | wpb 261628 | bsz 63.9 | num_updates 9277 | lr 0.000594482 | gnorm 0.064 | clip 0 | loss_scale 8 | train_wall 195 | gb_free 1.5 | wall 1258
+Start iterating over samples
+begin validation on "valid" subset
+epoch 028 | valid on 'valid' subset | loss 1.086 | ppl 2.12 | wps 1.2724e+06 | wpb 250000 | bsz 61.1 | num_updates 9621 | best_loss 1.076
+epoch 028 | valid on 'valid' subset | loss 1.086 | ppl 2.12 | wps 1.2724e+06 | wpb 250000 | bsz 61.1 | num_updates 9621 | best_loss 1.076
+epoch 028 | valid on 'valid' subset | loss 1.086 | ppl 2.12 | wps 1.2724e+06 | wpb 250000 | bsz 61.1 | num_updates 9621 | best_loss 1.076
+epoch 028 | valid on 'valid' subset | loss 1.086 | ppl 2.12 | wps 1.2724e+06 | wpb 250000 | bsz 61.1 | num_updates 9621 | best_loss 1.076
+epoch 028 | valid on 'valid' subset | loss 1.086 | ppl 2.12 | wps 1.2724e+06 | wpb 250000 | bsz 61.1 | num_updates 9621 | best_loss 1.076
+epoch 028 | valid on 'valid' subset | loss 1.086 | ppl 2.12 | wps 1.2724e+06 | wpb 250000 | bsz 61.1 | num_updates 9621 | best_loss 1.076
+epoch 028 | valid on 'valid' subset | loss 1.086 | ppl 2.12 | wps 1.2724e+06 | wpb 250000 | bsz 61.1 | num_updates 9621 | best_loss 1.076
+end of epoch 28 (average epoch stats below)
+epoch 028 | loss 0.899 | ppl 1.86 | wps 432607 | ups 1.65 | wpb 261628 | bsz 63.9 | num_updates 9621 | lr 0.00054998 | gnorm 0.064 | clip 0 | loss_scale 8 | train_wall 195 | gb_free 1.5 | wall 1466
+epoch 028 | loss 0.899 | ppl 1.86 | wps 432607 | ups 1.65 | wpb 261628 | bsz 63.9 | num_updates 9621 | lr 0.00054998 | gnorm 0.064 | clip 0 | loss_scale 8 | train_wall 195 | gb_free 1.5 | wall 1466
+epoch 028 | loss 0.899 | ppl 1.86 | wps 432607 | ups 1.65 | wpb 261628 | bsz 63.9 | num_updates 9621 | lr 0.00054998 | gnorm 0.064 | clip 0 | loss_scale 8 | train_wall 195 | gb_free 1.5 | wall 1466
+epoch 028 | loss 0.899 | ppl 1.86 | wps 432607 | ups 1.65 | wpb 261628 | bsz 63.9 | num_updates 9621 | lr 0.00054998 | gnorm 0.064 | clip 0 | loss_scale 8 | train_wall 195 | gb_free 1.5 | wall 1466
+epoch 028 | loss 0.899 | ppl 1.86 | wps 432607 | ups 1.65 | wpb 261628 | bsz 63.9 | num_updates 9621 | lr 0.00054998 | gnorm 0.064 | clip 0 | loss_scale 8 | train_wall 195 | gb_free 1.5 | wall 1466
+epoch 028 | loss 0.899 | ppl 1.86 | wps 432607 | ups 1.65 | wpb 261628 | bsz 63.9 | num_updates 9621 | lr 0.00054998 | gnorm 0.064 | clip 0 | loss_scale 8 | train_wall 195 | gb_free 1.5 | wall 1466
+epoch 028 | loss 0.899 | ppl 1.86 | wps 432607 | ups 1.65 | wpb 261628 | bsz 63.9 | num_updates 9621 | lr 0.00054998 | gnorm 0.064 | clip 0 | loss_scale 8 | train_wall 195 | gb_free 1.5 | wall 1466
+Start iterating over samples
+begin validation on "valid" subset
+epoch 029 | valid on 'valid' subset | loss 1.085 | ppl 2.12 | wps 1.27478e+06 | wpb 250000 | bsz 61.1 | num_updates 9965 | best_loss 1.076
+epoch 029 | valid on 'valid' subset | loss 1.085 | ppl 2.12 | wps 1.27478e+06 | wpb 250000 | bsz 61.1 | num_updates 9965 | best_loss 1.076
+epoch 029 | valid on 'valid' subset | loss 1.085 | ppl 2.12 | wps 1.27478e+06 | wpb 250000 | bsz 61.1 | num_updates 9965 | best_loss 1.076
+epoch 029 | valid on 'valid' subset | loss 1.085 | ppl 2.12 | wps 1.27478e+06 | wpb 250000 | bsz 61.1 | num_updates 9965 | best_loss 1.076
+epoch 029 | valid on 'valid' subset | loss 1.085 | ppl 2.12 | wps 1.27478e+06 | wpb 250000 | bsz 61.1 | num_updates 9965 | best_loss 1.076
+epoch 029 | valid on 'valid' subset | loss 1.085 | ppl 2.12 | wps 1.27478e+06 | wpb 250000 | bsz 61.1 | num_updates 9965 | best_loss 1.076
+epoch 029 | valid on 'valid' subset | loss 1.085 | ppl 2.12 | wps 1.27478e+06 | wpb 250000 | bsz 61.1 | num_updates 9965 | best_loss 1.076
+epoch 029 | valid on 'valid' subset | loss 1.085 | ppl 2.12 | wps 1.27478e+06 | wpb 250000 | bsz 61.1 | num_updates 9965 | best_loss 1.076
+end of epoch 29 (average epoch stats below)
+epoch 029 | loss 0.886 | ppl 1.85 | wps 433532 | ups 1.66 | wpb 261628 | bsz 63.9 | num_updates 9965 | lr 0.000505077 | gnorm 0.063 | clip 0 | loss_scale 16 | train_wall 195 | gb_free 1.5 | wall 1674
+epoch 029 | loss 0.886 | ppl 1.85 | wps 433532 | ups 1.66 | wpb 261628 | bsz 63.9 | num_updates 9965 | lr 0.000505077 | gnorm 0.063 | clip 0 | loss_scale 16 | train_wall 195 | gb_free 1.5 | wall 1674
+epoch 029 | loss 0.886 | ppl 1.85 | wps 433532 | ups 1.66 | wpb 261628 | bsz 63.9 | num_updates 9965 | lr 0.000505077 | gnorm 0.063 | clip 0 | loss_scale 16 | train_wall 195 | gb_free 1.5 | wall 1674
+epoch 029 | loss 0.886 | ppl 1.85 | wps 433532 | ups 1.66 | wpb 261628 | bsz 63.9 | num_updates 9965 | lr 0.000505077 | gnorm 0.063 | clip 0 | loss_scale 16 | train_wall 195 | gb_free 1.5 | wall 1674
+epoch 029 | loss 0.886 | ppl 1.85 | wps 433532 | ups 1.66 | wpb 261628 | bsz 63.9 | num_updates 9965 | lr 0.000505077 | gnorm 0.063 | clip 0 | loss_scale 16 | train_wall 195 | gb_free 1.5 | wall 1674
+epoch 029 | loss 0.886 | ppl 1.85 | wps 433532 | ups 1.66 | wpb 261628 | bsz 63.9 | num_updates 9965 | lr 0.000505077 | gnorm 0.063 | clip 0 | loss_scale 16 | train_wall 195 | gb_free 1.5 | wall 1674
+epoch 029 | loss 0.886 | ppl 1.85 | wps 433532 | ups 1.66 | wpb 261628 | bsz 63.9 | num_updates 9965 | lr 0.000505077 | gnorm 0.063 | clip 0 | loss_scale 16 | train_wall 195 | gb_free 1.5 | wall 1674
+epoch 029 | loss 0.886 | ppl 1.85 | wps 433532 | ups 1.66 | wpb 261628 | bsz 63.9 | num_updates 9965 | lr 0.000505077 | gnorm 0.063 | clip 0 | loss_scale 16 | train_wall 195 | gb_free 1.5 | wall 1674
+Start iterating over samples
+begin validation on "valid" subset
+epoch 030 | valid on 'valid' subset | loss 1.086 | ppl 2.12 | wps 1.27333e+06 | wpb 250000 | bsz 61.1 | num_updates 10309 | best_loss 1.076
+epoch 030 | valid on 'valid' subset | loss 1.086 | ppl 2.12 | wps 1.27333e+06 | wpb 250000 | bsz 61.1 | num_updates 10309 | best_loss 1.076
+epoch 030 | valid on 'valid' subset | loss 1.086 | ppl 2.12 | wps 1.27333e+06 | wpb 250000 | bsz 61.1 | num_updates 10309 | best_loss 1.076
+epoch 030 | valid on 'valid' subset | loss 1.086 | ppl 2.12 | wps 1.27333e+06 | wpb 250000 | bsz 61.1 | num_updates 10309 | best_loss 1.076
+epoch 030 | valid on 'valid' subset | loss 1.086 | ppl 2.12 | wps 1.27333e+06 | wpb 250000 | bsz 61.1 | num_updates 10309 | best_loss 1.076
+epoch 030 | valid on 'valid' subset | loss 1.086 | ppl 2.12 | wps 1.27333e+06 | wpb 250000 | bsz 61.1 | num_updates 10309 | best_loss 1.076
+epoch 030 | valid on 'valid' subset | loss 1.086 | ppl 2.12 | wps 1.27333e+06 | wpb 250000 | bsz 61.1 | num_updates 10309 | best_loss 1.076
+epoch 030 | valid on 'valid' subset | loss 1.086 | ppl 2.12 | wps 1.27333e+06 | wpb 250000 | bsz 61.1 | num_updates 10309 | best_loss 1.076
+epoch 030 | valid on 'valid' subset | loss 1.086 | ppl 2.12 | wps 1.27333e+06 | wpb 250000 | bsz 61.1 | num_updates 10309 | best_loss 1.076
+end of epoch 30 (average epoch stats below)
+epoch 030 | loss 0.874 | ppl 1.83 | wps 433432 | ups 1.66 | wpb 261628 | bsz 63.9 | num_updates 10309 | lr 0.000460137 | gnorm 0.061 | clip 0 | loss_scale 32 | train_wall 195 | gb_free 1.5 | wall 1882
+epoch 030 | loss 0.874 | ppl 1.83 | wps 433432 | ups 1.66 | wpb 261628 | bsz 63.9 | num_updates 10309 | lr 0.000460137 | gnorm 0.061 | clip 0 | loss_scale 32 | train_wall 195 | gb_free 1.5 | wall 1882
+epoch 030 | loss 0.874 | ppl 1.83 | wps 433432 | ups 1.66 | wpb 261628 | bsz 63.9 | num_updates 10309 | lr 0.000460137 | gnorm 0.061 | clip 0 | loss_scale 32 | train_wall 195 | gb_free 1.5 | wall 1882
+epoch 030 | loss 0.874 | ppl 1.83 | wps 433432 | ups 1.66 | wpb 261628 | bsz 63.9 | num_updates 10309 | lr 0.000460137 | gnorm 0.061 | clip 0 | loss_scale 32 | train_wall 195 | gb_free 1.5 | wall 1882
+epoch 030 | loss 0.874 | ppl 1.83 | wps 433432 | ups 1.66 | wpb 261628 | bsz 63.9 | num_updates 10309 | lr 0.000460137 | gnorm 0.061 | clip 0 | loss_scale 32 | train_wall 195 | gb_free 1.5 | wall 1882
+epoch 030 | loss 0.874 | ppl 1.83 | wps 433432 | ups 1.66 | wpb 261628 | bsz 63.9 | num_updates 10309 | lr 0.000460137 | gnorm 0.061 | clip 0 | loss_scale 32 | train_wall 195 | gb_free 1.5 | wall 1882
+epoch 030 | loss 0.874 | ppl 1.83 | wps 433432 | ups 1.66 | wpb 261628 | bsz 63.9 | num_updates 10309 | lr 0.000460137 | gnorm 0.061 | clip 0 | loss_scale 32 | train_wall 195 | gb_free 1.5 | wall 1882
+epoch 030 | loss 0.874 | ppl 1.83 | wps 433432 | ups 1.66 | wpb 261628 | bsz 63.9 | num_updates 10309 | lr 0.000460137 | gnorm 0.061 | clip 0 | loss_scale 32 | train_wall 195 | gb_free 1.5 | wall 1882
+epoch 030 | loss 0.874 | ppl 1.83 | wps 433432 | ups 1.66 | wpb 261628 | bsz 63.9 | num_updates 10309 | lr 0.000460137 | gnorm 0.061 | clip 0 | loss_scale 32 | train_wall 195 | gb_free 1.5 | wall 1882
+Start iterating over samples
+begin validation on "valid" subset
+epoch 031 | valid on 'valid' subset | loss 1.087 | ppl 2.12 | wps 1.27161e+06 | wpb 250000 | bsz 61.1 | num_updates 10653 | best_loss 1.076
+epoch 031 | valid on 'valid' subset | loss 1.087 | ppl 2.12 | wps 1.27161e+06 | wpb 250000 | bsz 61.1 | num_updates 10653 | best_loss 1.076
+epoch 031 | valid on 'valid' subset | loss 1.087 | ppl 2.12 | wps 1.27161e+06 | wpb 250000 | bsz 61.1 | num_updates 10653 | best_loss 1.076
+epoch 031 | valid on 'valid' subset | loss 1.087 | ppl 2.12 | wps 1.27161e+06 | wpb 250000 | bsz 61.1 | num_updates 10653 | best_loss 1.076
+epoch 031 | valid on 'valid' subset | loss 1.087 | ppl 2.12 | wps 1.27161e+06 | wpb 250000 | bsz 61.1 | num_updates 10653 | best_loss 1.076
+epoch 031 | valid on 'valid' subset | loss 1.087 | ppl 2.12 | wps 1.27161e+06 | wpb 250000 | bsz 61.1 | num_updates 10653 | best_loss 1.076
+epoch 031 | valid on 'valid' subset | loss 1.087 | ppl 2.12 | wps 1.27161e+06 | wpb 250000 | bsz 61.1 | num_updates 10653 | best_loss 1.076
+epoch 031 | valid on 'valid' subset | loss 1.087 | ppl 2.12 | wps 1.27161e+06 | wpb 250000 | bsz 61.1 | num_updates 10653 | best_loss 1.076
+epoch 031 | valid on 'valid' subset | loss 1.087 | ppl 2.12 | wps 1.27161e+06 | wpb 250000 | bsz 61.1 | num_updates 10653 | best_loss 1.076
+epoch 031 | valid on 'valid' subset | loss 1.087 | ppl 2.12 | wps 1.27161e+06 | wpb 250000 | bsz 61.1 | num_updates 10653 | best_loss 1.076
+end of epoch 31 (average epoch stats below)
+epoch 031 | loss 0.862 | ppl 1.82 | wps 433335 | ups 1.66 | wpb 261628 | bsz 63.9 | num_updates 10653 | lr 0.000415523 | gnorm 0.061 | clip 0 | loss_scale 32 | train_wall 195 | gb_free 1.5 | wall 2089
+epoch 031 | loss 0.862 | ppl 1.82 | wps 433335 | ups 1.66 | wpb 261628 | bsz 63.9 | num_updates 10653 | lr 0.000415523 | gnorm 0.061 | clip 0 | loss_scale 32 | train_wall 195 | gb_free 1.5 | wall 2089
+epoch 031 | loss 0.862 | ppl 1.82 | wps 433335 | ups 1.66 | wpb 261628 | bsz 63.9 | num_updates 10653 | lr 0.000415523 | gnorm 0.061 | clip 0 | loss_scale 32 | train_wall 195 | gb_free 1.5 | wall 2089
+epoch 031 | loss 0.862 | ppl 1.82 | wps 433335 | ups 1.66 | wpb 261628 | bsz 63.9 | num_updates 10653 | lr 0.000415523 | gnorm 0.061 | clip 0 | loss_scale 32 | train_wall 195 | gb_free 1.5 | wall 2089
+epoch 031 | loss 0.862 | ppl 1.82 | wps 433335 | ups 1.66 | wpb 261628 | bsz 63.9 | num_updates 10653 | lr 0.000415523 | gnorm 0.061 | clip 0 | loss_scale 32 | train_wall 195 | gb_free 1.5 | wall 2089
+epoch 031 | loss 0.862 | ppl 1.82 | wps 433335 | ups 1.66 | wpb 261628 | bsz 63.9 | num_updates 10653 | lr 0.000415523 | gnorm 0.061 | clip 0 | loss_scale 32 | train_wall 195 | gb_free 1.5 | wall 2089
+epoch 031 | loss 0.862 | ppl 1.82 | wps 433335 | ups 1.66 | wpb 261628 | bsz 63.9 | num_updates 10653 | lr 0.000415523 | gnorm 0.061 | clip 0 | loss_scale 32 | train_wall 195 | gb_free 1.5 | wall 2089
+epoch 031 | loss 0.862 | ppl 1.82 | wps 433335 | ups 1.66 | wpb 261628 | bsz 63.9 | num_updates 10653 | lr 0.000415523 | gnorm 0.061 | clip 0 | loss_scale 32 | train_wall 195 | gb_free 1.5 | wall 2089
+epoch 031 | loss 0.862 | ppl 1.82 | wps 433335 | ups 1.66 | wpb 261628 | bsz 63.9 | num_updates 10653 | lr 0.000415523 | gnorm 0.061 | clip 0 | loss_scale 32 | train_wall 195 | gb_free 1.5 | wall 2089
+epoch 031 | loss 0.862 | ppl 1.82 | wps 433335 | ups 1.66 | wpb 261628 | bsz 63.9 | num_updates 10653 | lr 0.000415523 | gnorm 0.061 | clip 0 | loss_scale 32 | train_wall 195 | gb_free 1.5 | wall 2089
+Start iterating over samples
